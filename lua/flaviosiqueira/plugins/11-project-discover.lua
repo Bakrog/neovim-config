@@ -20,6 +20,13 @@ return {
                 type = "telescope",
             }
         }
+
+        local M = require("neovim-project.project")
+        local picker = require("neovim-project.picker")
+
+        vim.keymap.set("n", "<leader>pp", function(args)
+            picker.create_picker(args, true, M.switch_project)
+        end, { noremap = true, silent = true })
     end
 }
 
