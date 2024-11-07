@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Remember to install [ripgrep](https://github.com/BurntSushi/ripgrep)"
+
+if ! [ -e /usr/local/bin/vi ]; then ln -s /usr/local/bin/nvim /usr/local/bin/vi; fi
+
+if ! [ -e /usr/local/bin/vim ]; then ln -s /usr/local/bin/nvim /usr/local/bin/vim; fi
+
+if ! [ -e /usr/local/bin/view ]; then ln -s /usr/local/bin/nvim /usr/local/bin/view; fi
+
