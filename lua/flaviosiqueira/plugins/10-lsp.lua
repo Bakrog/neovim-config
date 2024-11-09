@@ -27,10 +27,15 @@ return {
         require("mason").setup()
         require("mason-lspconfig").setup({
             ensure_installed = {
+                "ansiblels",
                 "eslint",
+                --"hadolint",
+                "intelephense",
                 "lua_ls",
                 "marksman",
                 "rust_analyzer",
+                --"sqlfluff",
+                "tflint",
                 "ts_ls",
                 "ruff",
             },
