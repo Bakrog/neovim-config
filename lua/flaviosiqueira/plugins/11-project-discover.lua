@@ -1,3 +1,13 @@
+local function load_projects_locations()
+    local file = io.open(vim.fn.stdpath("config") .. "lua/flaviosiqueira/plugins/11-projects.json", "r")
+    if not file then
+        return {}
+
+    end
+    local jsonString = file:read("*all")
+    return vim.json.decode(jsonString)
+end
+
 return {
     "coffebar/neovim-project",
     dependencies = {
@@ -13,9 +23,11 @@ return {
     end,
 
     config = function ()
+        --local projects = load_projects_locations()
+        --print(vim.inspect(projects))
+
         require("neovim-project").setup {
-            projects = {
-            },
+            projects = load_projects_locations(),
             picker = {
                 type = "telescope",
             }
