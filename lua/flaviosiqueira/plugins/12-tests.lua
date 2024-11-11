@@ -35,13 +35,11 @@ return {
         })
 
         vim.keymap.set("n", "<leader>tc", function()
-            neotest.summary.clear_marked()
             neotest.output_panel.clear()
             neotest.run.run()
         end)
 
         vim.keymap.set("n", "<leader>tf", function()
-            neotest.summary.clear_marked()
             neotest.output_panel.clear()
             neotest.run.run(vim.fn.expand("%"))
         end)
