@@ -27,7 +27,9 @@ return {
             projects = load_projects_locations(),
             picker = {
                 type = "telescope",
-            }
+            },
+            last_session_on_startup = false,
+            dashboard_mode = true,
         }
 
         local M = require("neovim-project.project")
