@@ -10,6 +10,8 @@ are based on my personal preferences, please change them to suit your setup.
 * [fd](https://github.com/sharkdp/fd)
 * [fzf](https://github.com/junegunn/fzf)
 * [cmake](https://formulae.brew.sh/formula/cmake)
+* [nerd-fonts](https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation)
+* [nextest](https://nexte.st/docs/installation/pre-built-binaries/#macos-universal)
 
 
 ## Installation
