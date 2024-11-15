@@ -2,9 +2,11 @@ return {
     "tpope/vim-fugitive",
 
     config = function ()
-        vim.keymap.set("n", "<leader>ss", function ()
-            local git_command = vim.fn.input("> ")
-            vim.cmd.Git(git_command)
+        vim.keymap.set("n", "<leader>st", function ()
+            vim.cmd.Git("status")
+        end)
+        vim.keymap.set("n", "<leader>sg", function ()
+            vim.cmd.Git("commit -a -m \"" .. vim.fn.input("Commit message: ") .. "\"")
         end)
     end
 }
