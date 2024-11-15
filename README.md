@@ -24,3 +24,8 @@ git clone git@github.com:Bakrog/neovim-config.git ~/.config/nvim
 
 2. Start neovim and everything should be installed automatically.
 
+3. Ignore your projects.json file with the command:
+
+```sh
+git update-index --assume-unchanged lua/flaviosiqueira/plugins/11-projects.json
+```
