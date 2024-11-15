@@ -39,7 +39,7 @@ return {
         vim.keymap.set("n", "<leader>fs", builtin.find_files, {
             desc = "Files search"
         })
-        vim.keymap.set("n", "<leader>gs", builtin.git_files, {
+        vim.keymap.set("n", "<leader>gf", builtin.git_files, {
             desc = "Git files search",
         })
         vim.keymap.set("n", "<leader>ps", function()
