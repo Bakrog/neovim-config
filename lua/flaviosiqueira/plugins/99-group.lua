@@ -5,8 +5,14 @@ local autocmd = vim.api.nvim_create_autocmd
 
 autocmd('LspAttach', {
     group = FlavioSiqueiraGroup,
-    callback = function(e)
-        local opts = { buffer = e.buf }
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client ~= nil and client.name == 'ruff' then
+          -- Disable hover in favor of Pyright
+          client.server_capabilities.hoverProvider = false
+        end
+        -- Keymaps
+        local opts = { buffer = args.buf }
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
         vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)

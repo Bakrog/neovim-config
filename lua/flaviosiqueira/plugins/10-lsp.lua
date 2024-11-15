@@ -28,6 +28,7 @@ return {
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "ansiblels",
+                "basedpyright",
                 "eslint",
                 --"hadolint",
                 "intelephense",
@@ -44,6 +45,15 @@ return {
 
                     require("lspconfig")[server_name].setup {
                         capabilities = capabilities
+                    }
+                end,
+
+                basedpyright = function()
+                    local lspconfig = require("lspconfig")
+                    lspconfig.basedpyright.setup {
+                        --python = {
+                        --    venvPath = ".venv",
+                        --}
                     }
                 end,
 
