@@ -12,8 +12,7 @@ return {
         "rouge8/neotest-rust",
     },
     config = function()
-        local neotest = require("neotest")
-        neotest.setup({
+        require("neotest").setup({
             adapters = {
                 require("neotest-plenary").setup({
                     -- this is my standard location for minimal vim rc
@@ -35,16 +34,19 @@ return {
         })
 
         vim.keymap.set("n", "<leader>tc", function()
+            local neotest = require("neotest")
             neotest.output_panel.clear()
             neotest.run.run()
         end)
 
         vim.keymap.set("n", "<leader>tf", function()
+            local neotest = require("neotest")
             neotest.output_panel.clear()
             neotest.run.run(vim.fn.expand("%"))
         end)
 
         vim.keymap.set("n", "<leader>ts", function ()
+            local neotest = require("neotest")
             neotest.summary.toggle()
             neotest.output_panel.toggle()
         end)

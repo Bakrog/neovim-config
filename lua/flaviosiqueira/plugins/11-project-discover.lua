@@ -23,19 +23,36 @@ return {
     end,
 
     config = function ()
+        local config = require('session_manager.config')
         require("neovim-project").setup {
             projects = load_projects_locations(),
             picker = {
                 type = "telescope",
             },
-            last_session_on_startup = false,
-            dashboard_mode = true,
+            -- last_session_on_startup = false,
+            -- dashboard_mode = true,
+            -- Overwrite some of Session Manager options
+            session_manager_opts = {
+                autoload_mode = config.AutoloadMode.Disabled,
+                autosave_only_in_session = true,
+                autosave_ignore_dirs = {
+                    vim.fn.expand("~"), -- don't create a session for $HOME/
+                    "/tmp",
+                },
+                autosave_ignore_filetypes = {
+                    -- All buffers of these file types will be closed before the session is saved
+                    "ccc-ui",
+                    "gitcommit",
+                    "gitrebase",
+                    "qf",
+                    "toggleterm",
+                },
+            },
         }
 
-        local M = require("neovim-project.project")
-        local picker = require("neovim-project.picker")
-
         vim.keymap.set("n", "<leader>pp", function(args)
+            local M = require("neovim-project.project")
+            local picker = require("neovim-project.picker")
             picker.create_picker(args, true, M.switch_project)
         end, { noremap = true, silent = true })
     end
