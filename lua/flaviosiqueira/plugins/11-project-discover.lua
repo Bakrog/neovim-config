@@ -4,7 +4,7 @@ local function load_projects_locations()
         return {}
 
     end
-    local jsonString = file:read "*a"
+    local jsonString = string.gsub(file:read("*all"), "//[^,\n]*,\n", "")
     return vim.json.decode(jsonString)
 end
 
