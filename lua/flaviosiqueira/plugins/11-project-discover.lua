@@ -29,8 +29,8 @@ return {
             picker = {
                 type = "telescope",
             },
-            -- last_session_on_startup = false,
-            -- dashboard_mode = true,
+            last_session_on_startup = false,
+            dashboard_mode = true,
             -- Overwrite some of Session Manager options
             session_manager_opts = {
                 autoload_mode = config.AutoloadMode.Disabled,

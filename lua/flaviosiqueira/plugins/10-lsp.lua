@@ -70,6 +70,34 @@ return {
                         }
                     }
                 end,
+
+                ["rust_analyzer"] = function()
+                    local lspconfig = require("lspconfig")
+                    lspconfig.rust_analyzer.setup {
+                        capabilities = capabilities,
+                        on_attach = function(client, bufnr)
+                            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                        end,
+                        settings = {
+                            ["rust-analyzer"] = {
+                                imports = {
+                                    granularity = {
+                                        group = "module",
+                                    },
+                                    prefix = "self",
+                                },
+                                cargo = {
+                                    buildScripts = {
+                                        enable = true,
+                                    },
+                                },
+                                procMacro = {
+                                    enable = true
+                                },
+                            }
+                        }
+                    }
+                end,
             }
         })
 

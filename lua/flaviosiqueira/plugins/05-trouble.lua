@@ -12,12 +12,12 @@ return {
             trouble.toggle("diagnostics")
         end)
 
-        vim.keymap.set("n", "[t", function()
+        vim.keymap.set("n", "tp", function()
             trouble.prev("diagnostics")
             trouble.jump("diagnostics")
         end)
 
-        vim.keymap.set("n", "]t", function()
+        vim.keymap.set("n", "tn", function()
             trouble.next("diagnostics")
             trouble.jump("diagnostics")
         end)
