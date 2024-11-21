@@ -24,14 +24,12 @@ return {
                     -- the default case_mode is "smart_case"
                 },
                 ["ui-select"] = {
-                    require("telescope.themes").get_dropdown {
-
-                    }
+                    require("telescope.themes").get_dropdown({})
                 },
             }
         }
 
-        require('telescope').load_extension('fzf')
+        require("telescope").load_extension("fzf")
         require("telescope").load_extension("ui-select")
 
         local builtin = require("telescope.builtin")
