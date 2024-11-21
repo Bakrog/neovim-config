@@ -6,7 +6,13 @@ return {
 
     config = function()
         local trouble = require("trouble")
-        trouble.setup({})
+        trouble.setup({
+            win = {
+                wo = {
+                    wrap = true,
+                },
+            },
+        })
 
         vim.keymap.set("n", "<leader>tt", function()
             trouble.toggle("diagnostics")
