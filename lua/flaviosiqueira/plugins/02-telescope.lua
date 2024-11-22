@@ -14,7 +14,7 @@ return {
     },
 
     config = function()
-        require("telescope").setup {
+        require("telescope").setup({
             extensions = {
                 fzf = {
                     fuzzy = true,                    -- false will only do exact matching
@@ -27,10 +27,10 @@ return {
                     require("telescope.themes").get_dropdown({})
                 },
             }
-        }
+        })
 
-        require("telescope").load_extension("fzf")
         require("telescope").load_extension("ui-select")
+        require("telescope").load_extension("fzf")
 
         local builtin = require("telescope.builtin")
 
