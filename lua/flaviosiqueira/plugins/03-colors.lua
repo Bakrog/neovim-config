@@ -16,7 +16,8 @@ return {
         require("rose-pine").setup({
             background = "none",
         })
-        vim.cmd("colorscheme rose-pine")
+        vim.cmd("colorscheme tokyonight")
+        --vim.cmd("colorscheme rose-pine")
         BackgroundTransparency("tokyonight")
     end
 }
