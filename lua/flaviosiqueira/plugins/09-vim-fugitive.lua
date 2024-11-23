@@ -8,10 +8,18 @@ local utils = require("telescope.utils")
 local strings = require("plenary.strings")
 
 local read_branchs = function ()
-    local handle = io.popen("git branch --no-color --all")
+    local cmd = "git branch --no-color --all"
+
+    local cmd_output = os.execute(cmd)
+    if cmd_output ~= 0 then
+        return {}
+    end
+
+    local handle = io.popen(cmd)
     if handle then
-        local git_branches = handle:read("*all")
+        local git_branches = handle:read("*a")
         handle:close()
+
         if git_branches and git_branches ~= "" then
             local result = git_branches:gsub(  -- remove origin/HEAD
                 "%s*remotes/origin/HEAD --> [^\n]*",
@@ -83,9 +91,12 @@ local branch_picker = function (opts)
             actions.select_default:replace(function()
                 actions.close(prompt_bufnr)
                 local selection = action_state.get_selected_entry()
-                if selection and selection.value then
+                if selection
+                    and selection.value
+                    and selection.value ~= nil
+                    and selection.value ~= "" then
                     local branch = selection.value:gsub("remotes/origin/", "")
-                    vim.cmd("Git switch -m --guess " .. branch)
+                    vim.cmd("silent Git switch -m --guess " .. branch)
                 end
             end)
             return true
