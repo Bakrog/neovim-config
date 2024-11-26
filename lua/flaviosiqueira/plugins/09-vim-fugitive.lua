@@ -112,7 +112,7 @@ return {
             vim.cmd.Git("status")
         end)
         vim.keymap.set("n", "<leader>gdf", function ()
-            vim.cmd.Git("diff")
+            vim.cmd.Git("diff HEAD")
         end)
         vim.keymap.set("n", "<leader>gss", function ()
             local opts = require("telescope.config").config
