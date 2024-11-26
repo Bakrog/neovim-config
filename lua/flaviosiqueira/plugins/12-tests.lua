@@ -1,3 +1,18 @@
+local python_path = function()
+    -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
+    -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
+    -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
+    local cwd = vim.fn.getcwd()
+    print("Python path: " .. cwd)
+    if vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
+        return cwd .. '/.venv/bin/python'
+    elseif vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
+        return cwd .. '/venv/bin/python'
+    else
+        return '/usr/local/bin/python'
+    end
+end
+
 return {
     "nvim-neotest/neotest",
     dependencies = {
@@ -19,7 +34,11 @@ return {
                     -- in all my projects
                     min_init = "./scripts/tests/minimal.vim",
                 }),
-                require("neotest-python"),
+                require("neotest-python")({
+                    dap = {
+                        justMyCode = true,
+                    },
+                }),
                 require("neotest-jest")({
                     jestCommand = "npm test --",
                     jestConfigFile = "custom.jest.config.ts",
@@ -49,6 +68,11 @@ return {
             local neotest = require("neotest")
             neotest.summary.toggle()
             neotest.output_panel.toggle()
+        end)
+
+        vim.keymap.set("n", "<leader>dt", function()
+            local neotest = require("neotest")
+            neotest.run.run({strategy = "dap"})
         end)
     end,
 }

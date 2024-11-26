@@ -27,6 +27,7 @@ return {
             },
             tabline = {},
             extensions = {
+                "nvim-dap-ui",
                 "fugitive",
                 "fzf",
                 "lazy",

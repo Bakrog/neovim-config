@@ -24,7 +24,11 @@ return {
         )
 
         require("fidget").setup({})
-        require("mason").setup()
+        require("mason").setup({
+            registries = {
+                "github:mason-org/mason-registry",
+            },
+        })
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "ansiblels",
@@ -43,23 +47,23 @@ return {
             handlers = {
                 function(server_name) -- default handler (optional)
 
-                    require("lspconfig")[server_name].setup {
+                    require("lspconfig")[server_name].setup({
                         capabilities = capabilities
-                    }
+                    })
                 end,
 
                 basedpyright = function()
                     local lspconfig = require("lspconfig")
-                    lspconfig.basedpyright.setup {
+                    lspconfig.basedpyright.setup({
                         --python = {
                         --    venvPath = ".venv",
                         --}
-                    }
+                    })
                 end,
 
                 ["lua_ls"] = function()
                     local lspconfig = require("lspconfig")
-                    lspconfig.lua_ls.setup {
+                    lspconfig.lua_ls.setup({
                         capabilities = capabilities,
                         settings = {
                             Lua = {
@@ -68,14 +72,14 @@ return {
                                 }
                             }
                         }
-                    }
+                    })
                 end,
 
                 ["rust_analyzer"] = function()
                     local lspconfig = require("lspconfig")
-                    lspconfig.rust_analyzer.setup {
+                    lspconfig.rust_analyzer.setup({
                         capabilities = capabilities,
-                        on_attach = function(client, bufnr)
+                        on_attach = function(_, bufnr)
                             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                         end,
                         settings = {
@@ -96,7 +100,7 @@ return {
                                 },
                             }
                         }
-                    }
+                    })
                 end,
             }
         })
@@ -129,7 +133,7 @@ return {
                 focusable = false,
                 style = "minimal",
                 border = "rounded",
-                source = "always",
+                source = true,
                 header = "",
                 prefix = "",
             },

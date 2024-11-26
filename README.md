@@ -12,6 +12,7 @@ are based on my personal preferences, please change them to suit your setup.
 * [cmake](https://formulae.brew.sh/formula/cmake)
 * [nerd-fonts](https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation)
 * [nextest](https://nexte.st/docs/installation/pre-built-binaries/#macos-universal)
+* [debugpy](https://github.com/microsoft/debugpy)
 
 
 ## Installation
