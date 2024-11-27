@@ -8,7 +8,7 @@ local utils = require("telescope.utils")
 local strings = require("plenary.strings")
 
 local read_branchs = function ()
-    local cmd = "git branch --no-color --all"
+    local cmd = "git --no-pager branch --no-color --all"
 
     local cmd_output = os.execute(cmd)
     if cmd_output ~= 0 then
@@ -24,15 +24,15 @@ local read_branchs = function ()
             local result = git_branches:gsub(  -- remove origin/HEAD
                 "%s*remotes/origin/HEAD --> [^\n]*",
                 ""
-            ):gsub(  -- remove spaces
+            ):gsub(  -- remove *
                 "%* ",
                 ""
-            ):gsub(  -- remove *
+            ):gsub(  -- remove spaces
                 "[ \t\f\v\r]*",
                 ""
             )
             local table_result = {}
-            result:gsub("([%a%p]+)", function (c)
+            result:gsub("([%a%d%p]+)", function (c)
                 table.insert(table_result, c)
             end)
             return table_result
