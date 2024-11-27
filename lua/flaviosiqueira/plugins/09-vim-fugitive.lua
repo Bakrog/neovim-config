@@ -118,6 +118,9 @@ return {
             local opts = require("telescope.config").config
             branch_picker(opts)
         end)
+        vim.keymap.set("n", "<leader>a", function ()
+            vim.cmd.Git("add %")
+        end)
         vim.keymap.set("n", "<leader>gc", function ()
             vim.cmd.Git("commit -a -m \"" .. vim.fn.input("Commit message: ") .. "\"")
         end)
