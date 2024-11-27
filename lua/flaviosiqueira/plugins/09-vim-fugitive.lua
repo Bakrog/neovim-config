@@ -10,7 +10,7 @@ local strings = require("plenary.strings")
 local read_branchs = function ()
     local cmd = "git --no-pager branch --no-color --all"
 
-    local cmd_output = os.execute(cmd)
+    local cmd_output = os.execute(cmd .. " > /dev/null 2>&1")
     if cmd_output ~= 0 then
         return {}
     end
