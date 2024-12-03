@@ -28,6 +28,9 @@ return {
             registries = {
                 "github:mason-org/mason-registry",
             },
+            ensure_installed = {
+                "prettier",
+            },
         })
         require("mason-lspconfig").setup({
             ensure_installed = {

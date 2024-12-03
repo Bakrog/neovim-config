@@ -118,8 +118,8 @@ return {
             local opts = require("telescope.config").config
             branch_picker(opts)
         end)
-        vim.keymap.set("n", "<leader>a", function ()
-            vim.cmd.Git("add %")
+        vim.keymap.set("n", "<leader>ga", function ()
+            vim.cmd.Git("add " .. vim.fn.expand("%"))
         end)
         vim.keymap.set("n", "<leader>gc", function ()
             vim.cmd.Git("commit -a -m \"" .. vim.fn.input("Commit message: ") .. "\"")
@@ -129,6 +129,9 @@ return {
         end)
         vim.keymap.set("n", "<leader>gpl", function ()
             vim.cmd.Git("pull --rebase --autostash")
+        end)
+        vim.keymap.set("n", "<leader>gr", function ()
+            vim.cmd.Git("rebase -i " .. vim.fn.input("Rebase from: "))
         end)
     end
 }

@@ -1,18 +1,3 @@
-local python_path = function()
-    -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-    -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-    -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
-    local cwd = vim.fn.getcwd()
-    print("Python path: " .. cwd)
-    if vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
-        return cwd .. '/.venv/bin/python'
-    elseif vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
-        return cwd .. '/venv/bin/python'
-    else
-        return '/usr/local/bin/python'
-    end
-end
-
 return {
     "nvim-neotest/neotest",
     dependencies = {
@@ -25,24 +10,29 @@ return {
         "nvim-neotest/neotest-jest",
         "jfpedroza/neotest-elixir",
         "rouge8/neotest-rust",
+        "pipoprods/nvm.nvim",
     },
     config = function()
+        ---@diagnostic disable-next-line: missing-fields
         require("neotest").setup({
+            ---@diagnostic disable-next-line: missing-fields
+            discovery = {
+                enabled = false,
+            },
             adapters = {
-                require("neotest-plenary").setup({
-                    -- this is my standard location for minimal vim rc
-                    -- in all my projects
-                    min_init = "./scripts/tests/minimal.vim",
-                }),
+                --require("neotest-plenary").setup({}),
                 require("neotest-python")({
                     dap = {
                         justMyCode = true,
                     },
+                    pytest_discover_instances = true,
                 }),
                 require("neotest-jest")({
-                    jestCommand = "npm test --",
-                    jestConfigFile = "custom.jest.config.ts",
-                    env = { CI = true },
+                    jestCommand = "yarn test",
+                    jestConfigFile = function ()
+                       return vim.fn.getcwd() .. "/jest.config.js"
+                    end,
+                    jest_test_discovery = true,
                     cwd = function()
                         return vim.fn.getcwd()
                     end,
@@ -64,6 +54,12 @@ return {
             neotest.run.run(vim.fn.expand("%"))
         end)
 
+        vim.keymap.set("n", "<leader>tT", function()
+            local neotest = require("neotest")
+            neotest.output_panel.clear()
+            neotest.run.run(vim.uv.cwd())
+        end)
+
         vim.keymap.set("n", "<leader>ts", function ()
             local neotest = require("neotest")
             neotest.summary.toggle()
@@ -72,7 +68,13 @@ return {
 
         vim.keymap.set("n", "<leader>dt", function()
             local neotest = require("neotest")
-            neotest.run.run({strategy = "dap"})
+            ---@diagnostic disable-next-line: missing-fields 
+            neotest.run.run({ strategy = "dap" })
+        end)
+
+        vim.keymap.set("n", "T", function()
+            local neotest = require("neotest")
+            neotest.output.open({ enter = true, auto_close = true })
         end)
     end,
 }

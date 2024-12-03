@@ -3,6 +3,24 @@ local FlavioSiqueiraGroup = augroup("FlavioSiqueira", {})
 
 local autocmd = vim.api.nvim_create_autocmd
 
+autocmd('DirChanged', {
+    group = FlavioSiqueiraGroup,
+    callback = function(args)
+        if args.match == "global" then
+            local file = io.open(args.file .. "/.nvmrc", "r")
+            if file ~= nil then
+                local nvmrc = file:read("*all"):gsub("\n", "")
+                if nvmrc ~= nil and nvmrc ~= "" then
+                    local node_path = vim.fn.expand("~/.local/share/nvm/v" .. nvmrc ..  "/bin")
+                    --vim.g.node_host_prog = node_path .. "/node"
+                    vim.env.PATH = node_path .. ":" .. vim.env.PATH
+                end
+                file:close()
+            end
+        end
+    end
+})
+
 autocmd('LspAttach', {
     group = FlavioSiqueiraGroup,
     callback = function(args)
