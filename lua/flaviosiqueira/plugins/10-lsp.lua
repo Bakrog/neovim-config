@@ -49,7 +49,6 @@ return {
             },
             handlers = {
                 function(server_name) -- default handler (optional)
-
                     require("lspconfig")[server_name].setup({
                         capabilities = capabilities
                     })
@@ -58,9 +57,17 @@ return {
                 basedpyright = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.basedpyright.setup({
-                        --python = {
-                        --    venvPath = ".venv",
-                        --}
+                        capabilities = capabilities,
+                        on_attach = function(_, bufnr)
+                            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                        end,
+                        python = {
+                            -- I always use this virtual environment
+                            -- configuration, you can define it in your project
+                            -- pyproject.toml file.
+                            venv = ".venv",
+                            venvPath = ".",
+                        }
                     })
                 end,
 
