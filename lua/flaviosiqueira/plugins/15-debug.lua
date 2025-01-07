@@ -1,4 +1,4 @@
-local python_path = function()
+local pythonPath = function()
     -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
     -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
     -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
@@ -12,18 +12,55 @@ local python_path = function()
     end
 end
 
+local rustPath = function()
+    local dap = require("dap")
+    vim.fn.jobstart(
+        { "cargo", "build", "-q" },
+        { env = { RUST_BACKTRACE = "1", RUSTFLAGS = "-g" } }
+    )
+    local paths = vim.fs.find(
+        { "Cargo.toml" },
+        {
+            path = vim.fs.dirname(vim.fn.expand("%")),
+            upward = true
+        }
+    )
+    --vim.notify(vim.inspect(paths), vim.log.levels.ERROR)
+    if paths == nil or #paths == 0 then
+        return dap.ABORT
+    end
+    local basename = vim.fs.basename(paths[1]:gsub("/Cargo.toml", ""))
+    --vim.notify(basename, vim.log.levels.ERROR)
+    return vim.fn.getcwd() .. "/target/debug/" .. basename
+end
+
 return {
     {
         "mfussenegger/nvim-dap",
         dependencies = {
             "theHamsta/nvim-dap-virtual-text",
         },
-        config = function()
-            local dap = require("dap")
-
-            vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint)
-            vim.keymap.set("n", "<leader>dc", dap.continue)
-        end,
+        keys = {
+            {
+                "<leader>db",
+                function()
+                    require("dap").toggle_breakpoint()
+                end
+            },
+            {
+                "<leader>dc",
+                function()
+                    require("dap").continue()
+                end
+            },
+            {
+                "<leader>ds",
+                function()
+                    require("dap").terminate()
+                    require("dapui").close()
+                end
+            },
+        },
     },
     {
         "rcarriga/nvim-dap-ui",
@@ -35,6 +72,7 @@ return {
             require("dapui").setup(opts)
 
             local dap, dapui = require("dap"), require("dapui")
+            dap.set_log_level("DEBUG")
 
 
             dap.adapters.python = function(cb, config)
@@ -69,7 +107,7 @@ return {
                     request = "launch",
                     name = "Launch file",
                     program = "${file}",
-                    pythonPath = python_path,
+                    pythonPath = pythonPath,
                     pathMappings = {
                         {
                             --localRoot = "${workspaceFolder}",
@@ -79,6 +117,222 @@ return {
                     },
                     justMyCode = true,
                 },
+            }
+
+            dap.adapters.lldb = {
+                type = "executable",
+                command = "/usr/local/opt/llvm/bin/lldb-dap",
+                name = "lldb",
+            }
+
+            dap.adapters.cppdbg = {
+                id = "cppdbg",
+                type = "executable",
+                command = vim.fn.stdpath("data") .. "/mason/bin/OpenDebugAD7",
+            }
+
+            local codelldb_location = "/mason/packages/codelldb/extension"
+
+            dap.adapters.codelldb = {
+                type = "server",
+                port = "${port}",
+                executable = {
+                    command = vim.fn.resolve(
+                        vim.fn.stdpath("data") ..
+                        codelldb_location ..
+                        "/adapter/codelldb"
+                    ),
+                    args = {
+                        "--port",
+                        "${port}",
+                        "--liblldb",
+                        vim.fn.resolve(
+                            vim.fn.stdpath("data") ..
+                            codelldb_location ..
+                            "/lldb/lib/liblldb.dylib"
+                        ),
+                    },
+                },
+            }
+
+            dap.configurations.rust = {
+                --{
+                --    name = "Launch file",
+                --    type = "cppdbg",
+                --    request = "launch",
+                --    program = rustPath,
+                --    cwd = vim.fn.getcwd,
+                --    stopAtEntry = true,
+                --},
+                --{
+                --    name = 'Attach to gdbserver :1234',
+                --    type = 'cppdbg',
+                --    request = 'launch',
+                --    MIMode = 'gdb',
+                --    miDebuggerServerAddress = 'localhost:1234',
+                --    miDebuggerPath = '/usr/bin/gdb',
+                --    cwd = vim.fn.getcwd,
+                --    program = rustPath,
+                --},
+                {
+                    name = "Launch file",
+                    type = "lldb",  -- codelldb
+                    request = "launch",
+                    program = rustPath,
+                    cwd = vim.fn.getcwd,
+                    stopOnEntry = false,
+                    terminal = "integrated",
+                    showDisassembly = false,
+                    initCommands = function()
+                        -- Find out where to look for the pretty printer Python module
+                        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
+
+                        local script_import = 'command script import "' ..
+                            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+                        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+
+                        local commands = {}
+                        local file = io.open(commands_file, 'r')
+                        if file then
+                            for line in file:lines() do
+                                table.insert(commands, line)
+                            end
+                            file:close()
+                        end
+                        table.insert(commands, 1, script_import)
+
+                        return commands
+                    end,
+                },
+                --{
+                --    name = 'Launch',
+                --    type = 'lldb',
+                --    request = 'launch',
+                --    program = rustPath,
+                --    cwd = vim.fn.getcwd,
+                --    stopOnEntry = false,
+                --    args = {},
+                --    runInTerminal = false,
+                --    initCommands = function()
+                --        -- Find out where to look for the pretty printer Python module
+                --        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
+
+                --        local script_import = 'command script import "' ..
+                --            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+                --        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+
+                --        local commands = {}
+                --        local file = io.open(commands_file, 'r')
+                --        if file then
+                --            for line in file:lines() do
+                --                table.insert(commands, line)
+                --            end
+                --            file:close()
+                --        end
+                --        table.insert(commands, 1, script_import)
+
+                --        return commands
+                --    end,
+                --},
+                --{
+                --    -- If you get an "Operation not permitted" error using this, try disabling YAMA:
+                --    --  echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+                --    name = "Attach to process",
+                --    type = 'lldb', -- Adjust this to match your adapter name (`dap.adapters.<name>`)
+                --    request = 'attach',
+                --    pid = require('dap.utils').pick_process,
+                --    args = {},
+                --},
+            }
+
+            dap.configurations.zig = {
+                --{
+                --    name = "Launch file",
+                --    type = "cppdbg",
+                --    request = "launch",
+                --    program = rustPath,
+                --    cwd = vim.fn.getcwd,
+                --    stopAtEntry = true,
+                --},
+                --{
+                --    name = 'Attach to gdbserver :1234',
+                --    type = 'cppdbg',
+                --    request = 'launch',
+                --    MIMode = 'gdb',
+                --    miDebuggerServerAddress = 'localhost:1234',
+                --    miDebuggerPath = '/usr/bin/gdb',
+                --    cwd = vim.fn.getcwd,
+                --    program = rustPath,
+                --},
+                {
+                    name = "Launch file",
+                    type = "lldb",  -- codelldb
+                    request = "launch",
+                    program = rustPath,
+                    cwd = vim.fn.getcwd,
+                    stopOnEntry = false,
+                    terminal = "integrated",
+                    showDisassembly = false,
+                    initCommands = function()
+                        -- Find out where to look for the pretty printer Python module
+                        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
+
+                        local script_import = 'command script import "' ..
+                            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+                        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+
+                        local commands = {}
+                        local file = io.open(commands_file, 'r')
+                        if file then
+                            for line in file:lines() do
+                                table.insert(commands, line)
+                            end
+                            file:close()
+                        end
+                        table.insert(commands, 1, script_import)
+
+                        return commands
+                    end,
+                },
+                --{
+                --    name = 'Launch',
+                --    type = 'lldb',
+                --    request = 'launch',
+                --    program = rustPath,
+                --    cwd = vim.fn.getcwd,
+                --    stopOnEntry = false,
+                --    args = {},
+                --    runInTerminal = false,
+                --    initCommands = function()
+                --        -- Find out where to look for the pretty printer Python module
+                --        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
+
+                --        local script_import = 'command script import "' ..
+                --            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+                --        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+
+                --        local commands = {}
+                --        local file = io.open(commands_file, 'r')
+                --        if file then
+                --            for line in file:lines() do
+                --                table.insert(commands, line)
+                --            end
+                --            file:close()
+                --        end
+                --        table.insert(commands, 1, script_import)
+
+                --        return commands
+                --    end,
+                --},
+                --{
+                --    -- If you get an "Operation not permitted" error using this, try disabling YAMA:
+                --    --  echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+                --    name = "Attach to process",
+                --    type = 'lldb', -- Adjust this to match your adapter name (`dap.adapters.<name>`)
+                --    request = 'attach',
+                --    pid = require('dap.utils').pick_process,
+                --    args = {},
+                --},
             }
 
             dap.listeners.before.attach.dapui_config = function()
@@ -95,17 +349,6 @@ return {
             end
         end
     },
-    --{
-    --    "jay-babu/mason-nvim-dap.nvim",
-    --    opts = {
-    --        ensure_installed = {
-    --            "python",
-    --        },
-    --        handlers = {
-    --            python = function() end,
-    --        },
-    --    },
-    --},
     {
         "mfussenegger/nvim-dap-python",
         dependencies = {
@@ -120,4 +363,3 @@ return {
         --end,
     },
 }
-

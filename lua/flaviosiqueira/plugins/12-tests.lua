@@ -11,6 +11,60 @@ return {
         "jfpedroza/neotest-elixir",
         "rouge8/neotest-rust",
         "pipoprods/nvm.nvim",
+        --"mrcjkb/rustaceanvim",
+        {
+            "lawrence-laz/neotest-zig",
+            version = "1.3.*",
+        },
+    },
+    keys = {
+        {
+            "<leader>tc",
+            function()
+                local neotest = require("neotest")
+                neotest.output_panel.clear()
+                neotest.run.run()
+            end
+        },
+        {
+            "<leader>tf",
+            function()
+                local neotest = require("neotest")
+                neotest.output_panel.clear()
+                neotest.run.run(vim.fn.expand("%"))
+            end
+        },
+        {
+            "<leader>tT",
+            function()
+                local neotest = require("neotest")
+                neotest.output_panel.clear()
+                neotest.run.run(vim.uv.cwd())
+            end
+        },
+        {
+            "<leader>ts",
+            function()
+                local neotest = require("neotest")
+                neotest.summary.toggle()
+                neotest.output_panel.toggle()
+            end
+        },
+        {
+            "<leader>td",
+            function()
+                local neotest = require("neotest")
+                ---@diagnostic disable-next-line: missing-fields
+                neotest.run.run({ suite = false, strategy = "dap" })
+            end
+        },
+        {
+            "T",
+            function()
+                local neotest = require("neotest")
+                neotest.output.open({ enter = true, auto_close = true })
+            end
+        },
     },
     config = function()
         ---@diagnostic disable-next-line: missing-fields
@@ -20,7 +74,7 @@ return {
                 enabled = false,
             },
             adapters = {
-                --require("neotest-plenary").setup({}),
+                require("neotest-plenary").setup({}),
                 require("neotest-python")({
                     dap = {
                         justMyCode = true,
@@ -29,8 +83,8 @@ return {
                 }),
                 require("neotest-jest")({
                     jestCommand = "yarn test",
-                    jestConfigFile = function ()
-                       return vim.fn.getcwd() .. "/jest.config.js"
+                    jestConfigFile = function()
+                        return vim.fn.getcwd() .. "/jest.config.js"
                     end,
                     jest_test_discovery = true,
                     cwd = function()
@@ -38,44 +92,19 @@ return {
                     end,
                 }),
                 require("neotest-elixir"),
-                require("neotest-rust"),
+                require("neotest-rust")({
+                    args = { "--no-capture" },
+                    dap_adapter = "codelldb",
+                }),
+                --require('rustaceanvim.neotest'),
+                require("neotest-zig")({
+                    debug_log = true,
+                    log_level = vim.log.levels.TRACE,
+                    dap = {
+                        adapter = "codelldb",
+                    }
+                }),
             }
         })
-
-        vim.keymap.set("n", "<leader>tc", function()
-            local neotest = require("neotest")
-            neotest.output_panel.clear()
-            neotest.run.run()
-        end)
-
-        vim.keymap.set("n", "<leader>tf", function()
-            local neotest = require("neotest")
-            neotest.output_panel.clear()
-            neotest.run.run(vim.fn.expand("%"))
-        end)
-
-        vim.keymap.set("n", "<leader>tT", function()
-            local neotest = require("neotest")
-            neotest.output_panel.clear()
-            neotest.run.run(vim.uv.cwd())
-        end)
-
-        vim.keymap.set("n", "<leader>ts", function ()
-            local neotest = require("neotest")
-            neotest.summary.toggle()
-            neotest.output_panel.toggle()
-        end)
-
-        vim.keymap.set("n", "<leader>dt", function()
-            local neotest = require("neotest")
-            ---@diagnostic disable-next-line: missing-fields 
-            neotest.run.run({ strategy = "dap" })
-        end)
-
-        vim.keymap.set("n", "T", function()
-            local neotest = require("neotest")
-            neotest.output.open({ enter = true, auto_close = true })
-        end)
     end,
 }
-

@@ -41,6 +41,32 @@ return {
                 force_version = "v0.5.1", -- force blink to use v0.5.1
             },
         },
-    }
+    },
+    {
+        "stevearc/conform.nvim",
+        event = { "BufReadPre", "BufNewFile" },
+        keys = {
+            {
+                "<leader>l",
+                function ()
+                    local conform = require("conform")
+                    conform.format({
+                        lsp_fallback = true,
+                        async = true,
+                        timeout_ms = 1000,
+                    })
+                end
+            },
+        },
+        config = function()
+            require("conform").setup({
+                formatters_by_ft = {
+                    lua = { "stylua" },
+                    kotlin = { "ktlint" },
+                    python = { "ruff" },
+                },
+            })
+        end,
+    },
 }
 
