@@ -73,6 +73,7 @@ return {
             discovery = {
                 enabled = false,
             },
+            --log_level = vim.log.levels.TRACE,
             adapters = {
                 require("neotest-plenary").setup({}),
                 require("neotest-python")({
@@ -98,11 +99,9 @@ return {
                 }),
                 --require('rustaceanvim.neotest'),
                 require("neotest-zig")({
-                    debug_log = true,
-                    log_level = vim.log.levels.TRACE,
-                    dap = {
-                        adapter = "codelldb",
-                    }
+                    --dap = {
+                    --    adapter = "codelldb",
+                    --}
                 }),
             }
         })
