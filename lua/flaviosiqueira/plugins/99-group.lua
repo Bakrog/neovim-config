@@ -31,14 +31,16 @@ autocmd('LspAttach', {
         end
         -- Keymaps
         local opts = { buffer = args.buf }
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        local builtin = require('telescope.builtin')
+        vim.keymap.set("n", "gd", builtin.lsp_definitions, opts)
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
         vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-        vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
-        vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-        vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-        vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-        vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+        vim.keymap.set("n", "<leader>ws", builtin.lsp_workspace_symbols, opts)
+        vim.keymap.set("n", "<leader>sp", builtin.diagnostics, opts)
+        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+        vim.keymap.set("n", "<leader>gr", builtin.lsp_references, opts)
+        vim.keymap.set("n", "<leader>gs", builtin.lsp_document_symbols, opts)
+        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
         vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
         vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
         vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
