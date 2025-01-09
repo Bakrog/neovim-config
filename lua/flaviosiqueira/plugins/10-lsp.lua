@@ -58,7 +58,7 @@ return {
             "L3MON4D3/LuaSnip",
             "saadparwaiz1/cmp_luasnip",
             "j-hui/fidget.nvim",
-            "mfussenegger/nvim-jdtls",
+            --"mfussenegger/nvim-jdtls",
             {
                 "kotlin-community-tools/kotlin-language-server",
                 name = "kls",
@@ -165,7 +165,7 @@ return {
                     "eslint",
                     --"hadolint",
                     "intelephense",
-                    "jdtls",
+                    --"jdtls",
                     "kotlin_language_server",
                     "lua_ls",
                     "marksman",
@@ -186,7 +186,7 @@ return {
                     basedpyright = function()
                         local lspconfig = require("lspconfig")
                         lspconfig.basedpyright.setup({
-                            capabilities = capabilities,
+                            --capabilities = capabilities,
                             on_attach = function(_, bufnr)
                                 vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                             end,
@@ -200,26 +200,26 @@ return {
                         })
                     end,
 
-                    jdtls = function()
-                        local lspconfig = require("lspconfig")
-                        lspconfig.jdtls.setup({
-                            capabilities = capabilities,
-                            on_attach = function(_, bufnr)
-                                vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                            end,
-                            cmd = {
-                                "jdtls",
-                                "-configuration",
-                                vim.fn.resolve(vim.fn.stdpath("config") .. "/jdtls/config"),
-                                "-data",
-                                vim.fn.resolve(vim.fn.stdpath("data") .. "/jdtls/data"),
-                            },
-                            root_dir = lspconfig.util.root_pattern("pom.xml", "gradle.build"),
-                            init_options = {
-                                workspace = vim.fn.resolve(vim.fn.stdpath("data") .. "/jdtls/data"),
-                            }
-                        })
-                    end,
+                    -- jdtls = function()
+                    --     local lspconfig = require("lspconfig")
+                    --     lspconfig.jdtls.setup({
+                    --         capabilities = capabilities,
+                    --         on_attach = function(_, bufnr)
+                    --             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                    --         end,
+                    --         cmd = {
+                    --             "jdtls",
+                    --             "-configuration",
+                    --             vim.fn.resolve(vim.fn.stdpath("config") .. "/jdtls/config"),
+                    --             "-data",
+                    --             vim.fn.resolve(vim.fn.stdpath("data") .. "/jdtls/data"),
+                    --         },
+                    --         root_dir = lspconfig.util.root_pattern("pom.xml", "gradle.build"),
+                    --         init_options = {
+                    --             workspace = vim.fn.resolve(vim.fn.stdpath("data") .. "/jdtls/data"),
+                    --         }
+                    --     })
+                    -- end,
 
                     ["kotlin_language_server"] = function()
                         local lspconfig = require("lspconfig")

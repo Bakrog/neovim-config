@@ -52,8 +52,8 @@ return {
                     local conform = require("conform")
                     conform.format({
                         lsp_fallback = true,
-                        async = true,
-                        timeout_ms = 1000,
+                        async = false,
+                        timeout_ms = 4000,
                     })
                 end
             },
