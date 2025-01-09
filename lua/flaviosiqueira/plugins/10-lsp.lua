@@ -186,7 +186,12 @@ return {
                     basedpyright = function()
                         local lspconfig = require("lspconfig")
                         lspconfig.basedpyright.setup({
-                            --capabilities = capabilities,
+                            capabilities = capabilities,
+                            cmd = {
+                                vim.fn.stdpath("data") ..
+                                "/mason/bin/basedpyright-langserver",
+                                "--stdio",
+                            },
                             on_attach = function(_, bufnr)
                                 vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                             end,
@@ -196,7 +201,14 @@ return {
                                 -- pyproject.toml file.
                                 venv = ".venv",
                                 venvPath = ".",
-                            }
+                            },
+                            settings = {
+                                basedpyright = {
+                                    analysis = {
+                                        diagnosticMode = "workspace",
+                                    },
+                                },
+                            },
                         })
                     end,
 
