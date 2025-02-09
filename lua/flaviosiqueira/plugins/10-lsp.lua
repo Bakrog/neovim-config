@@ -160,6 +160,7 @@ return {
                 ensure_installed = {
                     "ansiblels",
                     "basedpyright",
+                    "denols",
                     "docker_compose_language_service",
                     "dockerls",
                     "eslint",

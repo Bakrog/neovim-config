@@ -2,6 +2,7 @@ return {
     {
         "folke/lazydev.nvim",
         ft = "lua", -- only load on lua files
+        keys = {},
         opts = {
             library = {
                 -- See the configuration section for more details
@@ -14,6 +15,7 @@ return {
     { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
     {                                        -- optional cmp completion source for require statements and module annotations
         "hrsh7th/nvim-cmp",
+        keys = {},
         opts = function(_, opts)
             opts.sources = opts.sources or {}
             table.insert(opts.sources, {
@@ -24,7 +26,8 @@ return {
     },
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
-        version = "v0.5.1",
+        version = "v0.5.1", 
+        keys = {},
         opts = {
             sources = {
                 -- add lazydev to your completion providers
