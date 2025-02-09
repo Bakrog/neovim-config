@@ -47,5 +47,7 @@ autocmd('LspAttach', {
     end
 })
 
+vim.cmd([[cab cc CodeCompanion]])
+
 return {}
 

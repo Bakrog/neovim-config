@@ -23,6 +23,7 @@ return {
             function()
                 local neotest = require("neotest")
                 neotest.output_panel.clear()
+                neotest.summary.clear_marked()
                 neotest.run.run()
             end
         },
@@ -31,6 +32,7 @@ return {
             function()
                 local neotest = require("neotest")
                 neotest.output_panel.clear()
+                neotest.summary.clear_marked()
                 neotest.run.run(vim.fn.expand("%"))
             end
         },
@@ -39,6 +41,7 @@ return {
             function()
                 local neotest = require("neotest")
                 neotest.output_panel.clear()
+                neotest.summary.clear_marked()
                 neotest.run.run(vim.uv.cwd())
             end
         },
@@ -54,6 +57,8 @@ return {
             "<leader>td",
             function()
                 local neotest = require("neotest")
+                neotest.output_panel.clear()
+                neotest.summary.clear_marked()
                 ---@diagnostic disable-next-line: missing-fields
                 neotest.run.run({ suite = false, strategy = "dap" })
             end
@@ -83,11 +88,12 @@ return {
                     pytest_discover_instances = true,
                 }),
                 require("neotest-jest")({
-                    jestCommand = "yarn test",
+                    jestCommand = "yarn test --",
                     jestConfigFile = function()
                         return vim.fn.getcwd() .. "/jest.config.js"
                     end,
-                    jest_test_discovery = true,
+                    jest_test_discovery = false,
+                    --env = { CI = true },
                     cwd = function()
                         return vim.fn.getcwd()
                     end,
