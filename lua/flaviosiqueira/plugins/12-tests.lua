@@ -16,6 +16,7 @@ return {
             "lawrence-laz/neotest-zig",
             version = "1.3.*",
         },
+        "marilari88/neotest-vitest",
     },
     keys = {
         {
@@ -87,6 +88,7 @@ return {
                     },
                     pytest_discover_instances = true,
                 }),
+                require("neotest-vitest"),
                 require("neotest-jest")({
                     jestCommand = "yarn test --",
                     jestConfigFile = function()

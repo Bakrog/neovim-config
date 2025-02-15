@@ -312,6 +312,68 @@ return {
                         })
                     end,
 
+                    ["ts_ls"] = function()
+                        local lspconfig = require("lspconfig")
+                        lspconfig.ts_ls.setup({
+                            capabilities = capabilities,
+                            init_options = {
+                                preferences = {
+                                    importModuleSpecifierPreference = 'relative',
+                                    includePackageJsonAutoImports = 'auto'
+                                }
+                            },
+                            -- Add this to help resolve modules in pnpm
+                            cmd = { "typescript-language-server", "--stdio" },
+                            root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", ".git"),
+                            -- Make sure TypeScript can find your project's dependencies
+                            filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "mjs", "cjs" },
+                        })
+                    end,
+
+                    eslint = function()
+                        local lspconfig = require("lspconfig")
+                        lspconfig.eslint.setup({
+                            -- This ensures ESLint can find your project's ESLint config
+                            root_dir = require 'lspconfig'.util.root_pattern(
+                                '.eslintrc',
+                                '.eslintrc.js',
+                                '.eslintrc.json'
+                            ),
+                            settings = {
+                                codeAction = {
+                                    disableRuleComment = {
+                                        enable = true,
+                                        location = "separateLine"
+                                    },
+                                    showDocumentation = {
+                                        enable = true
+                                    }
+                                },
+                                codeActionOnSave = {
+                                    enable = false,
+                                    mode = "all"
+                                },
+                                experimental = {
+                                    useFlatConfig = false
+                                },
+                                format = true,
+                                nodePath = "",
+                                onIgnoredFiles = "off",
+                                problems = {
+                                    shortenToSingleLine = false
+                                },
+                                quiet = false,
+                                rulesCustomizations = {},
+                                run = "onType",
+                                useESLintClass = false,
+                                validate = "on",
+                                workingDirectory = {
+                                    mode = "auto"
+                                },
+                            },
+                        })
+                    end,
+
                     zls = function()
                         local lspconfig = require("lspconfig")
                         lspconfig.zls.setup({
@@ -327,6 +389,7 @@ return {
                 ensure_installed = {
                     "codelldb",
                     "cpptools",
+                    "js-debug-adapter",
                     "ktlint",
                     "prettier",
                     "sqlfluff",

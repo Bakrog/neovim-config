@@ -119,6 +119,27 @@ return {
                 },
             }
 
+            dap.adapters["pwa-node"] = {
+                type = "server",
+                host = "localhost",
+                port = "${port}",
+                executable = {
+                    command = vim.fn.stdpath("data") .. "/mason/bin/js-debug-adapter",
+                    -- 💀 Make sure to update this path to point to your installation
+                    args = { "${port}" },
+                },
+            }
+            dap.configurations.javascript = {
+                {
+                    type = "pwa-node",
+                    request = "launch",
+                    name = "Launch file",
+                    program = "${file}",
+                    cwd = "${workspaceFolder}",
+                },
+            }
+            dap.configurations.typescript = dap.configurations.javascript
+
             dap.adapters.lldb = {
                 type = "executable",
                 command = "/usr/local/opt/llvm/bin/lldb-dap",
@@ -176,7 +197,7 @@ return {
                 --},
                 {
                     name = "Launch file",
-                    type = "lldb",  -- codelldb
+                    type = "lldb", -- codelldb
                     request = "launch",
                     program = rustPath,
                     cwd = vim.fn.getcwd,
@@ -266,7 +287,7 @@ return {
                 --},
                 {
                     name = "Launch file",
-                    type = "lldb",  -- codelldb
+                    type = "lldb", -- codelldb
                     request = "launch",
                     program = rustPath,
                     cwd = vim.fn.getcwd,
