@@ -58,6 +58,7 @@ return {
             "L3MON4D3/LuaSnip",
             "saadparwaiz1/cmp_luasnip",
             "j-hui/fidget.nvim",
+            "saghen/blink.cmp",
             --"mfussenegger/nvim-jdtls",
             {
                 "kotlin-community-tools/kotlin-language-server",
@@ -142,7 +143,8 @@ return {
                 "force",
                 {},
                 vim.lsp.protocol.make_client_capabilities(),
-                cmp_lsp.default_capabilities()
+                cmp_lsp.default_capabilities(),
+                require('blink.cmp').get_lsp_capabilities()
             )
             capabilities.textDocument.foldingRange = {
                 dynamicRegistration = false,

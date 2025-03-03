@@ -18,35 +18,53 @@ return {
         keys = {},
         opts = function(_, opts)
             opts.sources = opts.sources or {}
+            opts.performance = opts.performance or {}
             table.insert(opts.sources, {
                 name = "lazydev",
                 group_index = 0, -- set group index to 0 to skip loading LuaLS completions
             })
+            table.insert(opts.sources, { name = "minuet" })
+            opts.performance.fetching_timeout = 2000
         end,
     },
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
-        version = "v0.5.1", 
+        version = '*',
         keys = {},
         opts = {
             sources = {
                 -- add lazydev to your completion providers
-                completion = {
-                    enabled_providers = { "lsp", "path", "snippets", "buffer", "lazydev" },
-                },
+                default = { "lsp", "path", "snippets", "buffer", "lazydev", "minuet" },
                 providers = {
                     -- dont show LuaLS require statements when lazydev has items
-                    lsp = { fallback_for = { "lazydev" } },
-                    lazydev = { name = "LazyDev", module = "lazydev.integrations.blink" },
+                    lazydev = {
+                        name = "LazyDev",
+                        module = "lazydev.integrations.blink",
+                        fallbacks = { "lsp" },
+                    },
+                    minuet = {
+                        name = "minuet",
+                        module = "minuet.blink",
+                        score_offset = 8, -- Gives minuet higher priority among suggestions
+                    },
                 },
                 per_filetype = {
                     codecompanion = { "codecompanion" },
                 },
             },
-            fuzzy = {
-                force_version = "v0.5.1", -- force blink to use v0.5.1
+            appearance = {
+                -- Sets the fallback highlight groups to nvim-cmp's highlight groups
+                -- Useful for when your theme doesn't support blink.cmp
+                -- Will be removed in a future release
+                use_nvim_cmp_as_default = true,
+                -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+                -- Adjusts spacing to ensure icons are aligned
+                nerd_font_variant = 'mono'
             },
+            fuzzy = { implementation = "prefer_rust" },
+            completion = { trigger = { prefetch_on_insert = false } },
         },
+        opts_extend = { "sources.default" },
     },
     {
         "stevearc/conform.nvim",
@@ -69,7 +87,7 @@ return {
                 formatters_by_ft = {
                     lua = { "stylua" },
                     kotlin = { "ktlint" },
-                    python = { "ruff" },
+                    python = { "ruff_fix", "ruff_format" },
                     -- Conform will run the first available formatter
                     javascript = { "prettierd", "prettier", stop_after_first = true },
                     typescript = { "prettierd", "prettier", stop_after_first = true },
