@@ -128,7 +128,7 @@ return {
                             },
                         },
                         fold_virt_text_handler = handler,
-                        provider_selector = function(bufnr, filetype, buftype)
+                        provider_selector = function()
                             return { "lsp", "marker" }
                         end,
                     })
@@ -152,6 +152,7 @@ return {
             }
 
             require("fidget").setup({})
+            ---@diagnostic disable-next-line: missing-fields
             require("mason").setup({
                 registries = {
                     "github:mason-org/mason-registry",
@@ -162,7 +163,7 @@ return {
                 ensure_installed = {
                     "ansiblels",
                     "basedpyright",
-                    "denols",
+                    --"denols",
                     "docker_compose_language_service",
                     "dockerls",
                     "eslint",
