@@ -13,20 +13,20 @@ return {
         },
     },
     { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
-    {                                        -- optional cmp completion source for require statements and module annotations
-        "hrsh7th/nvim-cmp",
-        keys = {},
-        opts = function(_, opts)
-            opts.sources = opts.sources or {}
-            opts.performance = opts.performance or {}
-            table.insert(opts.sources, {
-                name = "lazydev",
-                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-            })
-            table.insert(opts.sources, { name = "minuet" })
-            opts.performance.fetching_timeout = 2000
-        end,
-    },
+    --{                                        -- optional cmp completion source for require statements and module annotations
+    --    "hrsh7th/nvim-cmp",
+    --    keys = {},
+    --    opts = function(_, opts)
+    --        opts.sources = opts.sources or {}
+    --        opts.performance = opts.performance or {}
+    --        table.insert(opts.sources, {
+    --            name = "lazydev",
+    --            group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+    --        })
+    --        table.insert(opts.sources, { name = "minuet" })
+    --        opts.performance.fetching_timeout = 2000
+    --    end,
+    --},
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
         version = '*',
@@ -56,7 +56,7 @@ return {
                 -- Sets the fallback highlight groups to nvim-cmp's highlight groups
                 -- Useful for when your theme doesn't support blink.cmp
                 -- Will be removed in a future release
-                use_nvim_cmp_as_default = true,
+                use_nvim_cmp_as_default = false,
                 -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
                 -- Adjusts spacing to ensure icons are aligned
                 nerd_font_variant = 'mono'

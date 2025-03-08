@@ -133,7 +133,7 @@ return {
             { "nvim-lua/plenary.nvim" },
             -- optional, if you are using virtual-text frontend, nvim-cmp is not
             -- required.
-            { "hrsh7th/nvim-cmp" },
+            --{ "hrsh7th/nvim-cmp" },
             -- optional, if you are using virtual-text frontend, blink is not required.
             { "Saghen/blink.cmp" },
         },
@@ -156,30 +156,30 @@ return {
                         },
                         stream = true,
                         api_key = "ANTHROPIC_API_KEY",
-                        optional = {
-                            generationConfig = {
-                                maxOutputTokens = 256,
-                                topP = 0.9,
-                            },
-                            safetySettings = {
-                                {
-                                    category = 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                                    threshold = 'BLOCK_NONE',
-                                },
-                                {
-                                    category = 'HARM_CATEGORY_HATE_SPEECH',
-                                    threshold = 'BLOCK_NONE',
-                                },
-                                {
-                                    category = 'HARM_CATEGORY_HARASSMENT',
-                                    threshold = 'BLOCK_NONE',
-                                },
-                                {
-                                    category = 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                                    threshold = 'BLOCK_NONE',
-                                },
-                            },
-                        },
+                        --optional = {
+                        --      generationConfig = {
+                        --          maxOutputTokens = 256,
+                        --          topP = 0.9,
+                        --      },
+                        --    safetySettings = {
+                        --        {
+                        --            category = 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                        --            threshold = 'BLOCK_NONE',
+                        --        },
+                        --        {
+                        --            category = 'HARM_CATEGORY_HATE_SPEECH',
+                        --            threshold = 'BLOCK_NONE',
+                        --        },
+                        --        {
+                        --            category = 'HARM_CATEGORY_HARASSMENT',
+                        --            threshold = 'BLOCK_NONE',
+                        --        },
+                        --        {
+                        --            category = 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                        --            threshold = 'BLOCK_NONE',
+                        --        },
+                        --    },
+                        --},
                     },
                 }
             }
