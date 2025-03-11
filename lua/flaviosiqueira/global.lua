@@ -11,6 +11,9 @@ vim.g.have_nerd_fonts = true
 
 --vim.g.tokyonight_dark_float = false
 
+-- Set blinkcmp
+vim.g.lazyvim_blink_main = true
+
 -- Set netrw configurations
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0

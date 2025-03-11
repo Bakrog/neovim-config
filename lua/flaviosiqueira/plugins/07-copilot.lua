@@ -1,35 +1,7 @@
-local gemini_prompt = [[
-You are the backend of an AI-powered code completion engine. Your task is to
-provide code suggestions based on the user's input. The user's code will be
-enclosed in markers:
-
-- `<contextAfterCursor>`: Code context after the cursor
-- `<cursorPosition>`: Current cursor location
-- `<contextBeforeCursor>`: Code context before the cursor
-]]
-
-local gemini_few_shots = {}
-
-gemini_few_shots[1] = {
-    role = 'user',
-    content = [[
-# language: python
-<contextBeforeCursor>
-def fibonacci(n):
-    <cursorPosition>
-<contextAfterCursor>
-
-fib(5)]],
-}
-
-local gemini_chat_input_template =
-'{{{language}}}\n{{{tab}}}\n<contextBeforeCursor>\n{{{context_before_cursor}}}<cursorPosition>\n<contextAfterCursor>\n{{{context_after_cursor}}}'
-
-
 return {
     {
         "github/copilot.vim",
-        enabled = false,
+        enabled = true,
     },
     {
         "olimorris/codecompanion.nvim",
@@ -87,7 +59,7 @@ return {
             strategies = {
                 -- Change the default chat adapter
                 chat = {
-                    adapter = "anthropic",
+                    adapter = "gemini",
                     slash_commands = {
                         ["file"] = {
                             -- Location to the slash command in CodeCompanion
@@ -101,7 +73,7 @@ return {
                     },
                 },
                 inline = {
-                    adapter = "anthropic",
+                    adapter = "gemini",
                 },
             },
             display = {
@@ -123,12 +95,13 @@ return {
             },
             opts = {
                 -- Set debug logging
-                --log_level = "DEBUG",
+                log_level = "DEBUG",
             },
         },
     },
     {
         "milanglacier/minuet-ai.nvim",
+        enabled = false,
         dependencies = {
             { "nvim-lua/plenary.nvim" },
             -- optional, if you are using virtual-text frontend, nvim-cmp is not
@@ -136,50 +109,58 @@ return {
             --{ "hrsh7th/nvim-cmp" },
             -- optional, if you are using virtual-text frontend, blink is not required.
             { "Saghen/blink.cmp" },
+            {
+                "Davidyz/VectorCode",
+                version = "*",                     -- optional, depending on whether you're on nightly or release
+                build = "pipx upgrade vectorcode", -- optional but recommended if you set `version = "*"`
+                dependencies = { "nvim-lua/plenary.nvim" },
+            },
         },
         config = function()
-            gemini_few_shots[2] = require('minuet.config').default_few_shots[2]
-
+            local vectorcode_cacher = require("vectorcode.config").get_cacher_backend()
             require("minuet").setup {
-                -- Your configuration options here
+                add_single_line_entry = true,
+                n_completions = 1,
+                cmp = {
+                    enable_auto_complete = false,
+                },
+                blink = {
+                    enable_auto_complete = true,
+                },
+                -- I recommend you start with a small context window firstly, and gradually
+                -- increase it based on your local computing power.
+                --context_window = 512,
+                after_cursor_filter_length = 30,
+                notify = "debug",
                 provider = "claude",
                 provider_options = {
                     claude = {
                         max_tokens = 512,
                         model = "claude-3-7-sonnet-20250219",
-                        system = {
-                            prompt = gemini_prompt,
-                        },
-                        few_shots = gemini_few_shots,
-                        chat_input = {
-                            template = gemini_chat_input_template,
-                        },
                         stream = true,
                         api_key = "ANTHROPIC_API_KEY",
-                        --optional = {
-                        --      generationConfig = {
-                        --          maxOutputTokens = 256,
-                        --          topP = 0.9,
-                        --      },
-                        --    safetySettings = {
-                        --        {
-                        --            category = 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                        --            threshold = 'BLOCK_NONE',
-                        --        },
-                        --        {
-                        --            category = 'HARM_CATEGORY_HATE_SPEECH',
-                        --            threshold = 'BLOCK_NONE',
-                        --        },
-                        --        {
-                        --            category = 'HARM_CATEGORY_HARASSMENT',
-                        --            threshold = 'BLOCK_NONE',
-                        --        },
-                        --        {
-                        --            category = 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                        --            threshold = 'BLOCK_NONE',
-                        --        },
-                        --    },
-                        --},
+                        system = {
+                            template = '{{{prompt}}}\n{{{guidelines}}}\n{{{n_completion_template}}}\n{{{repo_context}}}',
+                            repo_context = [[9. Additional context from other files in the repository will be enclosed in <repo_context> tags. Each file will be separated by <file_separator> tags, containing its relative path and content.]],
+                        },
+                        chat_input = {
+                            template = '{{{repo_context}}}\n{{{language}}}\n{{{tab}}}\n<contextBeforeCursor>\n{{{context_before_cursor}}}<cursorPosition>\n<contextAfterCursor>\n{{{context_after_cursor}}}',
+                            repo_context = function(_, _, _)
+                                local prompt_message = ''
+                                local cache_result = vectorcode_cacher.query_from_cache(0)
+                                for _, file in ipairs(cache_result) do
+                                    prompt_message = prompt_message
+                                        .. '<file_separator>'
+                                        .. file.path
+                                        .. '\n'
+                                        .. file.document
+                                end
+                                if prompt_message ~= '' then
+                                    prompt_message = '<repo_context>\n' .. prompt_message .. '\n</repo_context>'
+                                end
+                                return prompt_message
+                            end,
+                        },
                     },
                 }
             }
