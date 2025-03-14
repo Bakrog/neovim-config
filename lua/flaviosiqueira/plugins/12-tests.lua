@@ -9,9 +9,9 @@ return {
         "nvim-neotest/neotest-python",
         "nvim-neotest/neotest-jest",
         "jfpedroza/neotest-elixir",
-        "rouge8/neotest-rust",
+        --"rouge8/neotest-rust",
         "pipoprods/nvm.nvim",
-        --"mrcjkb/rustaceanvim",
+        "mrcjkb/rustaceanvim",
         {
             "lawrence-laz/neotest-zig",
             version = "1.3.*",
@@ -101,11 +101,11 @@ return {
                     end,
                 }),
                 require("neotest-elixir"),
-                require("neotest-rust")({
-                    args = { "--no-capture" },
-                    dap_adapter = "codelldb",
-                }),
-                --require('rustaceanvim.neotest'),
+                --require("neotest-rust")({
+                --    args = { "--no-capture" },
+                --    dap_adapter = "codelldb",
+                --}),
+                require('rustaceanvim.neotest'),
                 require("neotest-zig")({
                     --dap = {
                     --    adapter = "codelldb",

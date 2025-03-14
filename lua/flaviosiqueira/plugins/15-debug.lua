@@ -140,43 +140,43 @@ return {
             }
             dap.configurations.typescript = dap.configurations.javascript
 
-            dap.adapters.lldb = {
-                type = "executable",
-                command = "/usr/local/opt/llvm/bin/lldb-dap",
-                name = "lldb",
-            }
+            --dap.adapters.lldb = {
+            --    type = "executable",
+            --    command = "/usr/local/opt/llvm/bin/lldb-dap",
+            --    name = "lldb",
+            --}
 
-            dap.adapters.cppdbg = {
-                id = "cppdbg",
-                type = "executable",
-                command = vim.fn.stdpath("data") .. "/mason/bin/OpenDebugAD7",
-            }
+            --dap.adapters.cppdbg = {
+            --    id = "cppdbg",
+            --    type = "executable",
+            --    command = vim.fn.stdpath("data") .. "/mason/bin/OpenDebugAD7",
+            --}
 
-            local codelldb_location = "/mason/packages/codelldb/extension"
+            --local codelldb_location = "/mason/packages/codelldb/extension"
 
-            dap.adapters.codelldb = {
-                type = "server",
-                port = "${port}",
-                executable = {
-                    command = vim.fn.resolve(
-                        vim.fn.stdpath("data") ..
-                        codelldb_location ..
-                        "/adapter/codelldb"
-                    ),
-                    args = {
-                        "--port",
-                        "${port}",
-                        "--liblldb",
-                        vim.fn.resolve(
-                            vim.fn.stdpath("data") ..
-                            codelldb_location ..
-                            "/lldb/lib/liblldb.dylib"
-                        ),
-                    },
-                },
-            }
+            --dap.adapters.codelldb = {
+            --    type = "server",
+            --    port = "${port}",
+            --    executable = {
+            --        command = vim.fn.resolve(
+            --            vim.fn.stdpath("data") ..
+            --            codelldb_location ..
+            --            "/adapter/codelldb"
+            --        ),
+            --        args = {
+            --            "--port",
+            --            "${port}",
+            --            "--liblldb",
+            --            vim.fn.resolve(
+            --                vim.fn.stdpath("data") ..
+            --                codelldb_location ..
+            --                "/lldb/lib/liblldb.dylib"
+            --            ),
+            --        },
+            --    },
+            --}
 
-            dap.configurations.rust = {
+            --dap.configurations.rust = {
                 --{
                 --    name = "Launch file",
                 --    type = "cppdbg",
@@ -195,36 +195,36 @@ return {
                 --    cwd = vim.fn.getcwd,
                 --    program = rustPath,
                 --},
-                {
-                    name = "Launch file",
-                    type = "lldb", -- codelldb
-                    request = "launch",
-                    program = rustPath,
-                    cwd = vim.fn.getcwd,
-                    stopOnEntry = false,
-                    terminal = "integrated",
-                    showDisassembly = false,
-                    initCommands = function()
-                        -- Find out where to look for the pretty printer Python module
-                        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
+                --{
+                --    name = "Launch file",
+                --    type = "lldb", -- codelldb
+                --    request = "launch",
+                --    program = rustPath,
+                --    cwd = vim.fn.getcwd,
+                --    stopOnEntry = false,
+                --    terminal = "integrated",
+                --    showDisassembly = false,
+                --    initCommands = function()
+                --        -- Find out where to look for the pretty printer Python module
+                --        local rustc_sysroot = vim.fn.trim(vim.fn.system('rustc --print sysroot'))
 
-                        local script_import = 'command script import "' ..
-                            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
-                        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+                --        local script_import = 'command script import "' ..
+                --            rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+                --        local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
 
-                        local commands = {}
-                        local file = io.open(commands_file, 'r')
-                        if file then
-                            for line in file:lines() do
-                                table.insert(commands, line)
-                            end
-                            file:close()
-                        end
-                        table.insert(commands, 1, script_import)
+                --        local commands = {}
+                --        local file = io.open(commands_file, 'r')
+                --        if file then
+                --            for line in file:lines() do
+                --                table.insert(commands, line)
+                --            end
+                --            file:close()
+                --        end
+                --        table.insert(commands, 1, script_import)
 
-                        return commands
-                    end,
-                },
+                --        return commands
+                --    end,
+                --},
                 --{
                 --    name = 'Launch',
                 --    type = 'lldb',
@@ -264,7 +264,7 @@ return {
                 --    pid = require('dap.utils').pick_process,
                 --    args = {},
                 --},
-            }
+            --}
 
             dap.configurations.zig = {
                 --{

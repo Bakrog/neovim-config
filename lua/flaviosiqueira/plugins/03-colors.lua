@@ -11,6 +11,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = true,
+    dependencies = { "rcarriga/nvim-notify" },
     config = function()
         require("rose-pine").setup({
             --background = "none",
@@ -39,5 +40,18 @@ return {
         })
         vim.cmd("colorscheme rose-pine")
         BackgroundTransparency()
+        require("notify").setup({
+            stages = "fade",
+            timeout = 5000,
+            background_colour = "#1f1d2e",
+            merge_duplicates = true,
+            icons = {
+                ERROR = "",
+                WARN = "",
+                INFO = "",
+                DEBUG = "",
+                TRACE = "✎",
+            },
+        })
     end
 }

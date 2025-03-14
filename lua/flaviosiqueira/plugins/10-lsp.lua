@@ -173,7 +173,7 @@ return {
                     "kotlin_language_server",
                     "lua_ls",
                     "marksman",
-                    "rust_analyzer",
+                    --"rust_analyzer",
                     --"sqlfluff",
                     "tflint",
                     "ts_ls",
@@ -272,48 +272,48 @@ return {
                         })
                     end,
 
-                    ["rust_analyzer"] = function()
-                        local lspconfig = require("lspconfig")
-                        lspconfig.rust_analyzer.setup({
-                            capabilities = capabilities,
-                            on_attach = function(_, bufnr)
-                                vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                            end,
-                            filetypes = { "rust" },
-                            root_dir = lspconfig.util.root_pattern("Cargo.toml"),
-                            settings = {
-                                ["rust-analyzer"] = {
-                                    cargo = {
-                                        allFeatures = true,
-                                        buildScripts = {
-                                            enable = true,
-                                        },
-                                    },
-                                    imports = {
-                                        granularity = {
-                                            group = "module",
-                                        },
-                                        prefix = "self",
-                                    },
-                                    interpret = {
-                                        tests = true,
-                                    },
-                                    lens = {
-                                        enable = true,
-                                        debug = {
-                                            enable = true,
-                                        },
-                                        implementations = {
-                                            enable = true,
-                                        },
-                                    },
-                                    procMacro = {
-                                        enable = true
-                                    },
-                                }
-                            }
-                        })
-                    end,
+                    --["rust_analyzer"] = function()
+                    --    local lspconfig = require("lspconfig")
+                    --    lspconfig.rust_analyzer.setup({
+                    --        capabilities = capabilities,
+                    --        on_attach = function(_, bufnr)
+                    --            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                    --        end,
+                    --        filetypes = { "rust" },
+                    --        root_dir = lspconfig.util.root_pattern("Cargo.toml"),
+                    --        settings = {
+                    --            ["rust-analyzer"] = {
+                    --                cargo = {
+                    --                    allFeatures = true,
+                    --                    buildScripts = {
+                    --                        enable = true,
+                    --                    },
+                    --                },
+                    --                imports = {
+                    --                    granularity = {
+                    --                        group = "module",
+                    --                    },
+                    --                    prefix = "self",
+                    --                },
+                    --                interpret = {
+                    --                    tests = true,
+                    --                },
+                    --                lens = {
+                    --                    enable = true,
+                    --                    debug = {
+                    --                        enable = true,
+                    --                    },
+                    --                    implementations = {
+                    --                        enable = true,
+                    --                    },
+                    --                },
+                    --                procMacro = {
+                    --                    enable = true
+                    --                },
+                    --            }
+                    --        }
+                    --    })
+                    --end,
 
                     ["ts_ls"] = function()
                         local lspconfig = require("lspconfig")
@@ -399,29 +399,6 @@ return {
                 },
             })
 
-            --local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-            --cmp.setup({
-            --    snippet = {
-            --        expand = function(args)
-            --            require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-            --        end,
-            --    },
-            --    mapping = cmp.mapping.preset.insert({
-            --        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-            --        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-            --        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-            --        ["<C-Space>"] = cmp.mapping.complete(),
-            --    }),
-            --    sources = cmp.config.sources({
-            --        { name = 'nvim_lsp' },
-            --        { name = 'crates' },
-            --        { name = 'luasnip' }, -- For luasnip users.
-            --    }, {
-            --        { name = 'buffer' },
-            --    })
-            --})
-
             vim.diagnostic.config({
                 -- update_in_insert = true,
                 float = {
@@ -435,38 +412,72 @@ return {
             })
         end
     },
-    --{
-    --    "mrcjkb/rustaceanvim",
-    --    version = '^5', -- Recommended
-    --    lazy = false,
-    --    ft = { "rust" },
-    --    dependencies = {
-    --        "neovim/nvim-lspconfig",
-    --        "mfussenegger/nvim-dap",
-    --    },
-    --    config = function()
-    --        local cmp_lsp = require("cmp_nvim_lsp")
-    --        local capabilities = vim.tbl_deep_extend(
-    --            "force",
-    --            {},
-    --            vim.lsp.protocol.make_client_capabilities(),
-    --            cmp_lsp.default_capabilities()
-    --        )
-    --        capabilities.textDocument.foldingRange = {
-    --            dynamicRegistration = false,
-    --            lineFoldingOnly = true
-    --        }
-    --        vim.g.rustaceanvim = {
-    --            server = {
-    --                capabilities = capabilities,
-    --                on_attach = function(_, bufnr)
-    --                    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-    --                end,
-    --            },
-    --            --dap = {
-    --            --    autoload_configurations = true,
-    --            --},
-    --        }
-    --    end
-    --},
+    {
+        "mrcjkb/rustaceanvim",
+        version = '^5', -- Recommended
+        lazy = false,
+        ft = { "rust" },
+        dependencies = {
+            "neovim/nvim-lspconfig",
+            "mfussenegger/nvim-dap",
+            "saghen/blink.cmp",
+        },
+        config = function()
+            local capabilities = vim.tbl_deep_extend(
+                "force",
+                {},
+                vim.lsp.protocol.make_client_capabilities(),
+                require('blink.cmp').get_lsp_capabilities()
+            )
+            capabilities.textDocument.foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true
+            }
+            local cfg = require('rustaceanvim.config')
+            local codelldb_location = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension"
+            local codelldb_path = vim.fn.resolve(codelldb_location .. "/adapter/codelldb")
+            local liblldb_path = vim.fn.resolve(codelldb_location .. "/lldb/lib/liblldb.dylib")
+
+            vim.g.rustaceanvim = {
+                server = {
+                    capabilities = capabilities,
+                    on_attach = function(_, bufnr)
+                        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                        vim.keymap.set(
+                            "n",
+                            "<leader>a",
+                            function()
+                                vim.cmd.RustLsp('codeAction') -- supports rust-analyzer's grouping
+                                -- or vim.lsp.buf.codeAction() if you don't want grouping.
+                            end,
+                            { silent = true, buffer = bufnr }
+                        )
+                        vim.keymap.set(
+                            "n",
+                            "K", -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
+                            function()
+                                vim.cmd.RustLsp({ 'hover', 'actions' })
+                            end,
+                            { silent = true, buffer = bufnr }
+                        )
+                    end,
+                },
+                dap = {
+                    autoload_configurations = true,
+                    adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+                },
+                tools = {
+                    autoSetHints = true,
+                    hover_with_actions = true,
+                    --test_executor = "background",
+                    runnables = {
+                        use_telescope = true,
+                    },
+                    debuggables = {
+                        use_telescope = true,
+                    },
+                },
+            }
+        end
+    },
 }
