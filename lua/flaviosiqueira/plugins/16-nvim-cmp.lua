@@ -33,7 +33,7 @@ return {
                 override = {
                     ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
                     ["vim.lsp.util.stylize_markdown"] = true,
-                    ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+                    -- ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
                 },
             },
             -- you can enable a preset for easier configuration
@@ -73,14 +73,106 @@ return {
     --},
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
-        version = '*',
+        --version = "*",
+        build = "cargo build --target x86_64-apple-darwin --release",
         -- In case there are breaking changes and you want to go back to the last
         -- working release
         -- https://github.com/Saghen/blink.cmp/releases
         -- version = "v0.9.3",
         dependencies = {
-            "moyiz/blink-emoji.nvim",
-            "onsails/lspkind.nvim",
+            { "moyiz/blink-emoji.nvim" },
+            { "onsails/lspkind.nvim" },
+            {
+                "xzbdmw/colorful-menu.nvim",
+                config = function()
+                    -- You don't need to set these options.
+                    require("colorful-menu").setup({
+                        ls = {
+                            lua_ls = {
+                                -- Maybe you want to dim arguments a bit.
+                                arguments_hl = "@comment",
+                            },
+                            gopls = {
+                                -- By default, we render variable/function's type in the right most side,
+                                -- to make them not to crowd together with the original label.
+
+                                -- when true:
+                                -- foo             *Foo
+                                -- ast         "go/ast"
+
+                                -- when false:
+                                -- foo *Foo
+                                -- ast "go/ast"
+                                align_type_to_right = true,
+                                -- When true, label for field and variable will format like "foo: Foo"
+                                -- instead of go's original syntax "foo Foo". If align_type_to_right is
+                                -- true, this option has no effect.
+                                add_colon_before_type = false,
+                                -- See https://github.com/xzbdmw/colorful-menu.nvim/pull/36
+                                preserve_type_when_truncate = true,
+                            },
+                            -- for lsp_config or typescript-tools
+                            ts_ls = {
+                                -- false means do not include any extra info,
+                                -- see https://github.com/xzbdmw/colorful-menu.nvim/issues/42
+                                extra_info_hl = "@comment",
+                            },
+                            vtsls = {
+                                -- false means do not include any extra info,
+                                -- see https://github.com/xzbdmw/colorful-menu.nvim/issues/42
+                                extra_info_hl = "@comment",
+                            },
+                            ["rust-analyzer"] = {
+                                -- Such as (as Iterator), (use std::io).
+                                extra_info_hl = "@comment",
+                                -- Similar to the same setting of gopls.
+                                align_type_to_right = true,
+                                -- See https://github.com/xzbdmw/colorful-menu.nvim/pull/36
+                                preserve_type_when_truncate = true,
+                            },
+                            clangd = {
+                                -- Such as "From <stdio.h>".
+                                extra_info_hl = "@comment",
+                                -- Similar to the same setting of gopls.
+                                align_type_to_right = true,
+                                -- the hl group of leading dot of "•std::filesystem::permissions(..)"
+                                import_dot_hl = "@comment",
+                                -- See https://github.com/xzbdmw/colorful-menu.nvim/pull/36
+                                preserve_type_when_truncate = true,
+                            },
+                            zls = {
+                                -- Similar to the same setting of gopls.
+                                align_type_to_right = true,
+                            },
+                            roslyn = {
+                                extra_info_hl = "@comment",
+                            },
+                            dartls = {
+                                extra_info_hl = "@comment",
+                            },
+                            -- The same applies to pyright/pylance
+                            basedpyright = {
+                                -- It is usually import path such as "os"
+                                extra_info_hl = "@comment",
+                            },
+                            -- If true, try to highlight "not supported" languages.
+                            fallback = true,
+                            -- this will be applied to label description for unsupport languages
+                            fallback_extra_info_hl = "@comment",
+                        },
+                        -- If the built-in logic fails to find a suitable highlight group for a label,
+                        -- this highlight is applied to the label.
+                        fallback_highlight = "@variable",
+                        -- If provided, the plugin truncates the final displayed text to
+                        -- this width (measured in display cells). Any highlights that extend
+                        -- beyond the truncation point are ignored. When set to a float
+                        -- between 0 and 1, it'll be treated as percentage of the width of
+                        -- the window: math.floor(max_width * vim.api.nvim_win_get_width(0))
+                        -- Default 60.
+                        max_width = 60,
+                    })
+                end,
+            },
         },
         keys = {},
         opts = {
@@ -114,7 +206,7 @@ return {
                     lsp = {
                         name = "lsp",
                         module = "blink.cmp.sources.lsp",
-                        min_keyword_length = 2,
+                        min_keyword_length = 0,
                         -- When linking markdown notes, I would get snippets and text in the
                         -- suggestions, I want those to show only if there are no LSP
                         -- suggestions
@@ -122,8 +214,8 @@ return {
                         -- Enabled fallbacks as this seems to be working now
                         -- Disabling fallbacks as my snippets wouldn't show up when editing
                         -- lua files
-                        -- fallbacks = { "snippets", "buffer" },
-                        score_offset = 0, -- the higher the number, the higher the priority
+                        fallbacks = { "buffer", "snippets" },
+                        score_offset = 90, -- the higher the number, the higher the priority
                     },
                     path = {
                         name = "Path",
@@ -145,7 +237,7 @@ return {
                         name = "Buffer",
                         max_items = 5,
                         module = "blink.cmp.sources.buffer",
-                        min_keyword_length = 5,
+                        min_keyword_length = 2,
                     },
                     snippets = {
                         name = "snippets",
@@ -251,7 +343,7 @@ return {
                     },
                     minuet = {
                         name = "minuet",
-                        enabled = false,
+                        enabled = true,
                         module = "minuet.blink",
                         score_offset = 100,
                     },
@@ -270,10 +362,17 @@ return {
                 -- Adjusts spacing to ensure icons are aligned
                 nerd_font_variant = 'mono'
             },
-            --fuzzy = { implementation = "prefer_rust" },
+            fuzzy = {
+                implementation = "prefer_rust",
+                --prebuilt_binaries = {
+                --    download = true,
+                --    ignore_version_mismatch = true,
+                --},
+            },
             completion = {
                 accept = { auto_brackets = { enabled = true } },
                 menu = {
+                    auto_show = true,
                     border = "rounded",
 
                     cmdline_position = function()
@@ -287,8 +386,8 @@ return {
 
                     draw = {
                         columns = {
-                            { "kind_icon", "label", gap = 1 },
-                            { "kind" },
+                            { "kind_icon" },
+                            { "label",    gap = 1 },
                         },
                         components = {
                             kind_icon = {
@@ -299,16 +398,12 @@ return {
                                 highlight = "CmpItemKind",
                             },
                             label = {
-                                text = function(item)
-                                    return item.label
+                                text = function(ctx)
+                                    return require("colorful-menu").blink_components_text(ctx)
                                 end,
-                                highlight = "CmpItemAbbr",
-                            },
-                            kind = {
-                                text = function(item)
-                                    return item.kind
+                                highlight = function(ctx)
+                                    return require("colorful-menu").blink_components_highlight(ctx)
                                 end,
-                                highlight = "CmpItemKind",
                             },
                         },
                     },
@@ -324,10 +419,23 @@ return {
                 -- Displays a preview of the selected item on the current line
                 ghost_text = {
                     enabled = false,
+                    show_with_menu = false,
+                },
+                keyword = {
+                    range = "full",
+                },
+                list = {
+                    selection = {
+                        preselect = false,
+                        auto_insert = false,
+                    },
                 },
                 trigger = {
-                    prefetch_on_insert = false
-                }
+                    prefetch_on_insert = true,
+                    show_on_trigger_character = true,
+                    show_on_insert_on_trigger_character = true,
+                    show_on_accept_on_trigger_character = true,
+                },
             },
             snippets = {
                 preset = "luasnip", -- Choose LuaSnip as the snippet engine
@@ -366,8 +474,8 @@ return {
                     local conform = require("conform")
                     conform.format({
                         lsp_fallback = true,
-                        async = false,
-                        timeout_ms = 4000,
+                        async = true,
+                        timeout_ms = 8000,
                     })
                 end
             },

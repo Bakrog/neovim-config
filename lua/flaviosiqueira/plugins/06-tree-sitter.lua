@@ -18,6 +18,7 @@ return {
                 "lua",
                 "python",
                 "query",
+                "regex",
                 "rust",
                 "typescript",
                 "vim",

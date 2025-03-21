@@ -1,7 +1,7 @@
 return {
     {
         "github/copilot.vim",
-        enabled = true,
+        enabled = false,
     },
     {
         "olimorris/codecompanion.nvim",
@@ -101,7 +101,7 @@ return {
     },
     {
         "milanglacier/minuet-ai.nvim",
-        enabled = false,
+        enabled = true,
         dependencies = {
             { "nvim-lua/plenary.nvim" },
             -- optional, if you are using virtual-text frontend, nvim-cmp is not
@@ -112,7 +112,7 @@ return {
             {
                 "Davidyz/VectorCode",
                 version = "*",                     -- optional, depending on whether you're on nightly or release
-                build = "pipx upgrade vectorcode", -- optional but recommended if you set `version = "*"`
+                build = "uv tool install --python-preference=system vectorcode", -- optional but recommended if you set `version = "*"`
                 dependencies = { "nvim-lua/plenary.nvim" },
             },
         },

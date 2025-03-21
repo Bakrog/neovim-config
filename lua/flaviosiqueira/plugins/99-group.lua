@@ -49,5 +49,21 @@ autocmd('LspAttach', {
 
 vim.cmd([[cab cc CodeCompanion]])
 
+-- Enter insert mode when switching to terminal
+autocmd("TermOpen", {
+  command = "setlocal listchars= nonumber norelativenumber nocursorline",
+})
+
+autocmd("TermOpen", {
+  pattern = "term://*",
+  command = "startinsert",
+})
+
+-- Close terminal buffer on process exit
+autocmd("BufLeave", {
+  pattern = "term://*",
+  command = "stopinsert",
+})
+
 return {}
 

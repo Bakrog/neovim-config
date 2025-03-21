@@ -27,7 +27,21 @@ return {
                 ["ui-select"] = {
                     require("telescope.themes").get_dropdown({})
                 },
-            }
+            },
+            pickers = {
+                find_files = {
+                    theme = "dropdown",
+                    hidden = true,
+                },
+                git_files = {
+                    theme = "dropdown",
+                    hidden = true,
+                },
+                grep_string = {
+                    theme = "dropdown",
+                    hidden = true,
+                },
+            },
         })
 
         require("telescope").load_extension("ui-select")

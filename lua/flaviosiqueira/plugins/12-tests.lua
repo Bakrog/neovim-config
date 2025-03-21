@@ -7,9 +7,8 @@ return {
         "nvim-treesitter/nvim-treesitter",
         "nvim-neotest/neotest-plenary",
         "nvim-neotest/neotest-python",
-        "nvim-neotest/neotest-jest",
+        "Bakrog/neotest-jest",
         "jfpedroza/neotest-elixir",
-        --"rouge8/neotest-rust",
         "pipoprods/nvm.nvim",
         "mrcjkb/rustaceanvim",
         {
@@ -75,9 +74,9 @@ return {
     config = function()
         ---@diagnostic disable-next-line: missing-fields
         require("neotest").setup({
-            ---@diagnostic disable-next-line: missing-fields
             discovery = {
-                enabled = false,
+                enabled = true,
+                concurrent = 0,
             },
             --log_level = vim.log.levels.TRACE,
             adapters = {
@@ -101,10 +100,6 @@ return {
                     end,
                 }),
                 require("neotest-elixir"),
-                --require("neotest-rust")({
-                --    args = { "--no-capture" },
-                --    dap_adapter = "codelldb",
-                --}),
                 require('rustaceanvim.neotest'),
                 require("neotest-zig")({
                     --dap = {

@@ -430,7 +430,7 @@ return {
                 require('blink.cmp').get_lsp_capabilities()
             )
             capabilities.textDocument.foldingRange = {
-                dynamicRegistration = false,
+                dynamicRegistration = true,
                 lineFoldingOnly = true
             }
             local cfg = require('rustaceanvim.config')
@@ -439,25 +439,46 @@ return {
             local liblldb_path = vim.fn.resolve(codelldb_location .. "/lldb/lib/liblldb.dylib")
 
             vim.g.rustaceanvim = {
+                capabilities = capabilities,
+                lsp = {
+                    auto_attach = true,
+                    standalone = false,
+                },
+                ra_multiplex = {
+                    enable = false,
+                },
+                create_graph = {},
                 server = {
-                    capabilities = capabilities,
+                    default_settings = {
+                        ['rust-analyzer'] = {
+                            cargo = {
+                                allFeatures = true,
+                                loadOutDirsFromCheck = true,
+                                runBuildScripts = true,
+                            },
+                            procMacro = {
+                                enable = true,
+                            },
+                            inlayHints = {
+                                lifetimeElisionHints = {
+                                    enable = true,
+                                    useParameterNames = true,
+                                },
+                            },
+                        },
+                    },
                     on_attach = function(_, bufnr)
                         vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                         vim.keymap.set(
                             "n",
-                            "<leader>a",
-                            function()
-                                vim.cmd.RustLsp('codeAction') -- supports rust-analyzer's grouping
-                                -- or vim.lsp.buf.codeAction() if you don't want grouping.
-                            end,
+                            "<leader>ca",
+                            "<cmd>RustLsp codeAction<cr>",
                             { silent = true, buffer = bufnr }
                         )
                         vim.keymap.set(
                             "n",
-                            "K", -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
-                            function()
-                                vim.cmd.RustLsp({ 'hover', 'actions' })
-                            end,
+                            "<leader>re",
+                            "<cmd>RustLsp explainError current<cr>",
                             { silent = true, buffer = bufnr }
                         )
                     end,
@@ -465,6 +486,9 @@ return {
                 dap = {
                     autoload_configurations = true,
                     adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+                    add_dynamic_library_paths = true,
+                    auto_generate_source_map = true,
+                    load_rust_types = true,
                 },
                 tools = {
                     autoSetHints = true,
