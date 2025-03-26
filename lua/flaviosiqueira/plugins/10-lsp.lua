@@ -442,28 +442,50 @@ return {
                 capabilities = capabilities,
                 lsp = {
                     auto_attach = true,
-                    standalone = false,
+                    --standalone = false,
                 },
                 ra_multiplex = {
-                    enable = false,
+                    enable = true,
                 },
                 create_graph = {},
                 server = {
                     default_settings = {
                         ['rust-analyzer'] = {
+                            checkOnSave = true,
                             cargo = {
-                                allFeatures = true,
-                                loadOutDirsFromCheck = true,
-                                runBuildScripts = true,
+                                features = "all",
+                                allTargets = true,
+                                buildScripts = {
+                                    enable = true,
+                                },
                             },
-                            procMacro = {
+                            check = {
+                                command = "clippy",
+                                workspace = true,
+                            },
+                            diagnostics = {
                                 enable = true,
+                                experimental = {
+                                    enable = true,
+                                },
+                                styleLints = {
+                                    enable = true,
+                                },
                             },
                             inlayHints = {
                                 lifetimeElisionHints = {
                                     enable = true,
                                     useParameterNames = true,
                                 },
+                            },
+                            imports = {
+                                granularity = {
+                                    group = "module",
+                                },
+                                prefix = "self",
+                            },
+                            procMacro = {
+                                enable = true,
                             },
                         },
                     },
