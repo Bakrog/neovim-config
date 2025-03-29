@@ -1,4 +1,4 @@
-local gemini_model = "gemini-2.0-flash-thinking-exp"
+local gemini_model = "gemini-2.5-pro-exp-03-25" --"gemini-2.0-flash-thinking-exp"
 local claude_model = "claude-3-7-sonnet-20250219"
 return {
     {
@@ -8,7 +8,7 @@ return {
     {
         "Davidyz/VectorCode",
         --version = "*",                                                        -- optional, depending on whether you're on nightly or release
-        build = "uv tool install --python-preference=system 'vectorcode[lsp] @ git+https://github.com/Davidyz/VectorCode'", -- optional but recommended if you set `version = "*"`
+        build = "uv tool install --python-preference=system 'vectorcode[lsp,legacy] @ git+https://github.com/Davidyz/VectorCode'", -- optional but recommended if you set `version = "*"`
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "VectorCode",                                              -- if you're lazy-loading VectorCode
         config = function()
