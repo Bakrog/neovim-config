@@ -386,6 +386,17 @@ return {
                             },
                         })
                     end,
+
+                    -- ["vectorcode_server"] = function()
+                    --     local lspconfig = require("lspconfig")
+                    --     lspconfig.vectorcode_server.setup({
+                    --         capabilities = capabilities,
+                    --         cmd = { "vectorcode-server" },
+                    --         root_dir = function()
+                    --             return lspconfig.util.root_pattern(".vectorcode", ".git")
+                    --         end,
+                    --     })
+                    -- end
                 }
             })
             require("mason-tool-installer").setup({

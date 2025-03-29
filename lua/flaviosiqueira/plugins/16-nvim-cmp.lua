@@ -187,7 +187,7 @@ return {
             end,
             sources = {
                 -- add lazydev to your completion providers
-                default = { "lsp", "path", "snippets", "buffer", "lazydev", "dadbod", "emoji" },
+                default = { "lsp", "path", "snippets", "buffer", "lazydev", "dadbod", "emoji", "minuet" },
                 providers = {
                     cmdline = {
                         enabled = function()
@@ -230,6 +230,9 @@ return {
                             --get_cwd = function(context)
                             --    return vim.fn.expand(("#%d:p:h"):format(context.bufnr))
                             --end,
+                            get_cwd = function(_)
+                                return vim.fn.getcwd()
+                            end,
                             show_hidden_files_by_default = true,
                         },
                     },
@@ -343,9 +346,9 @@ return {
                     },
                     minuet = {
                         name = "minuet",
-                        enabled = true,
                         module = "minuet.blink",
-                        score_offset = 100,
+                        score_offset = 10,
+                        timeout_ms = 5000,
                     },
                 },
                 per_filetype = {
@@ -455,6 +458,7 @@ return {
 
                 ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
                 ["<C-e>"] = { "hide", "fallback" },
+                --['<A-y>'] = require('minuet').make_blink_map(),
             },
             -- Experimental signature help support
             signature = {

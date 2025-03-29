@@ -1,7 +1,7 @@
 return {
     "nvim-lualine/lualine.nvim",
     requires = { "nvim-tree/nvim-web-devicons" },
-    dependencies = { "folke/noice.nvim" },
+    dependencies = { "folke/noice.nvim", {"Davidyz/VectorCode", lazy = false} },
 
     config = function()
         require("lualine").setup({
@@ -51,7 +51,22 @@ return {
                 lualine_y = {},
                 lualine_z = {},
             },
-            tabline = {},
+            tabline = {
+                lualine_y = {
+                    {
+                        function()
+                            return require("vectorcode.integrations").lualine(opts)[1]()
+                        end,
+                        cond = function()
+                            if package.loaded["vectorcode"] == nil then
+                                return false
+                            else
+                                return require("vectorcode.integrations").lualine(opts).cond()
+                            end
+                        end,
+                    },
+                }
+            },
             extensions = {
                 "nvim-dap-ui",
                 "fugitive",
