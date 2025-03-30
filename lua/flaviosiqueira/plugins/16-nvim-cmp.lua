@@ -187,7 +187,7 @@ return {
             end,
             sources = {
                 -- add lazydev to your completion providers
-                default = { "lsp", "path", "snippets", "buffer", "lazydev", "dadbod", "emoji", "minuet" },
+                default = { "lsp", "path", "snippets", "buffer", "lazydev", "dadbod", "emoji" },
                 providers = {
                     cmdline = {
                         enabled = function()
@@ -493,6 +493,7 @@ return {
                     -- Conform will run the first available formatter
                     javascript = { "prettierd", "prettier", stop_after_first = true },
                     typescript = { "prettierd", "prettier", stop_after_first = true },
+                    rust = { "rustfmt", lsp_format = "fallback", stop_after_first = true },
                 },
             })
         end,

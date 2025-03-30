@@ -1,20 +1,13 @@
-function BackgroundTransparency(color)
-    color = color or "rose-pine"
-    vim.cmd.colorscheme(color)
-
-    -- If you like transparent background, uncomment this
-    --vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-    --vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-end
-
+-- lua/flaviosiqueira/plugins/01-colors.lua
+-- Rose Pine theme configuration
 return {
     "rose-pine/neovim",
     name = "rose-pine",
-    enabled = true,
+    lazy = false, -- Load theme immediately
+    priority = 1000, -- Ensure it loads before other plugins
     dependencies = { "rcarriga/nvim-notify" },
     config = function()
         require("rose-pine").setup({
-            --background = "none",
             dim_inactive_windows = true,
             extend_background_behind_borders = true,
             enable = {
@@ -24,9 +17,10 @@ return {
             styles = {
                 italic = true,
                 bold = true,
-                transparency = true,
+                transparency = true, -- Keep background transparent
             },
             highlight_groups = {
+                -- Custom highlights for Telescope, Search, etc.
                 TelescopeBackground = { bg = "none", fg = "none" },
                 TelescopeBorder = { fg = "highlight_high", bg = "none" },
                 TelescopeNormal = { bg = "none" },
@@ -38,12 +32,14 @@ return {
                 Search = { bg = "rose", blend = 20, inherit = false },
             },
         })
-        vim.cmd("colorscheme rose-pine")
-        BackgroundTransparency()
+        -- Set the colorscheme
+        vim.cmd.colorscheme("rose-pine")
+
+        -- Configure nvim-notify with theme colors
         require("notify").setup({
             stages = "fade",
             timeout = 5000,
-            background_colour = "#1f1d2e",
+            background_colour = "#1f1d2e", -- Rose Pine base color
             merge_duplicates = true,
             icons = {
                 ERROR = "",

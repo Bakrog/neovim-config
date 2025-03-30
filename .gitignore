@@ -1,5 +1,5 @@
 # We don't want to track the projects.json file
-lua/flaviosiqueira/plugins/11-projects.json
+*projects.json
 jdtls/
 pack/
-
+chroma.log
