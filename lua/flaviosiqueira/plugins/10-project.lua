@@ -8,7 +8,7 @@ return {
         "Shatur/neovim-session-manager", -- Session management integration
     },
     -- Load on command or keymap
-    cmd = { "NeovimProjectRoot", "NeovimProjectLoad", "NeovimProjectLoadRecent" },
+    --cmd = { "NeovimProjectRoot", "NeovimProjectLoad", "NeovimProjectLoadRecent" },
     keys = {
         { "<leader>fp", desc = "Find Projects" } -- Placeholder description, mapped below
     },
@@ -25,12 +25,12 @@ return {
                 vim.notify("Project file not found: " .. projects_file, vim.log.levels.WARN)
                 return {}
             end
-            local content = file:read("*a")
+            local content = file:read("*all")
             file:close()
 
             -- Basic JSON cleaning (remove comments) - More robust parsing might be needed
             content = string.gsub(content, "//[^\n]*", "") -- Remove // comments
-            content = string.gsub(content, "/%*.-%*/", "") -- Remove /* */ comments (simple version)
+            --content = string.gsub(content, "/%*.-%*/", "") -- Remove /* */ comments (simple version)
 
             local ok, projects = pcall(vim.json.decode, content)
             if not ok then
@@ -41,7 +41,7 @@ return {
             return projects
         end
         -- Store loaded projects in a global or cached variable if needed early
-        -- vim.g.loaded_projects = load_projects_locations()
+        -- vim.g.loaded_projects = load_projects_locations
         _G.load_projects_locations = load_projects_locations -- Make accessible in config
     end,
     config = function()
