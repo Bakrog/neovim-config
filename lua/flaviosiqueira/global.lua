@@ -72,6 +72,6 @@ vim.opt.list = true -- Show invisible characters
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' } -- Define invisible characters
 
 -- Ensure undo directory exists
-if vim.fn.isdirectory(vim.opt.undodir:get()[0]) == 0 then
-    vim.fn.mkdir(vim.opt.undodir:get()[0], "p")
-end
+--if vim.fn.isdirectory(vim.opt.undodir:get()[0]) == 0 then
+--    vim.fn.mkdir(vim.opt.undodir:get()[0], "p")
+--end

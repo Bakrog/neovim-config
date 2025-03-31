@@ -46,6 +46,7 @@ return {
                 -- For diff view
                 "echasnovski/mini.diff",
                 version = false,
+                lazy = false,
                 config = function()
                     require("mini.diff").setup()
                 end,
@@ -61,7 +62,6 @@ return {
         config = function()
             local codecompanion = require("codecompanion")
             local adapters = require("codecompanion.adapters")
-            local strategies = require("codecompanion.strategies")
 
             -- Setup VectorCode integration helpers
             local vectorcode_chat_tool, vectorcode_slash_command
@@ -150,7 +150,7 @@ return {
                     },
                     diff = {
                         enabled = true,
-                        provider = "mini.diff", -- Use mini.diff for diff view
+                        provider = "mini_diff", -- Use mini.diff for diff view
                         layout = "vertical",
                         -- close_chat_at = 240, -- Adjust based on screen width
                         opts = { "internal", "filler", "closeoff", "algorithm:patience", "followwrap", "linematch:120" },
