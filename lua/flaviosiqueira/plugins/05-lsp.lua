@@ -65,11 +65,15 @@ return {
                 },
                 init = function()
                     -- Define folding keymaps
-                    vim.keymap.set('n', 'zR', require('ufo').openAllFolds, { desc = "UFO: Open All Folds" })
-                    vim.keymap.set('n', 'zM', require('ufo').closeAllFolds, { desc = "UFO: Close All Folds" })
-                    vim.keymap.set('n', 'zr', require('ufo').openFoldsExceptKinds,
-                        { desc = "UFO: Open Folds Except Kinds" })
-                    vim.keymap.set('n', 'zm', require('ufo').closeFoldsWith, { desc = "UFO: Close Folds With" })
+                    vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "UFO: Open All Folds" })
+                    vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "UFO: Close All Folds" })
+                    vim.keymap.set(
+                        "n",
+                        "zr",
+                        require("ufo").openFoldsExceptKinds,
+                        { desc = "UFO: Open Folds Except Kinds" }
+                    )
+                    vim.keymap.set("n", "zm", require("ufo").closeFoldsWith, { desc = "UFO: Close Folds With" })
                     -- Optional: Use treesitter folds for some filetypes
                     -- vim.o.foldmethod = 'expr'
                     -- vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
@@ -87,7 +91,7 @@ return {
                     })
                     -- Optionally show crates info automatically or via command
                     -- require("crates").show()
-                end
+                end,
             },
 
             -- Luasnip
@@ -96,8 +100,10 @@ return {
                 -- follow latest release.
                 version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
                 -- install jsregexp (optional!).
-                build = "make install_jsregexp"
+                build = "make install_jsregexp",
             },
+
+            "saghen/blink.cmp",
         },
         config = function()
             local lspconfig = require("lspconfig")
@@ -114,16 +120,12 @@ return {
                 "force",
                 {},
                 vim.lsp.protocol.make_client_capabilities(),
-                require('blink.cmp').get_lsp_capabilities()
+                require("blink.cmp").get_lsp_capabilities()
             )
             capabilities.textDocument.foldingRange = {
                 dynamicRegistration = false,
-                lineFoldingOnly = true
+                lineFoldingOnly = true,
             }
-            -- Integrate cmp capabilities if using nvim-cmp
-            -- local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-            -- capabilities = vim.tbl_deep_extend("force", capabilities, cmp_capabilities)
-
 
             -- List of servers to ensure are installed by Mason
             local ensure_installed_servers = {
@@ -156,9 +158,13 @@ return {
                 -- Default handler: Setup server with capabilities
                 function(server_name)
                     -- Skip rust-analyzer if rustaceanvim is handling it
-                    if server_name == "rust_analyzer" and vim.g.rustaceanvim then return end
+                    if server_name == "rust_analyzer" and vim.g.rustaceanvim then
+                        return
+                    end
                     -- Skip vectorcode_server if handled elsewhere
-                    if server_name == "vectorcode_server" then return end
+                    if server_name == "vectorcode_server" then
+                        return
+                    end
 
                     lspconfig[server_name].setup({
                         capabilities = capabilities,
@@ -185,8 +191,8 @@ return {
                                     checkThirdParty = false, -- Improve performance
                                 },
                                 telemetry = { enable = false },
-                            }
-                        }
+                            },
+                        },
                     })
                 end,
 
@@ -198,8 +204,8 @@ return {
                             settings = {
                                 -- Example: Configure lint rules if needed
                                 -- lint = { select = {"E", "F", "W"} }
-                            }
-                        }
+                            },
+                        },
                         -- on_attach function can be defined here or globally
                     })
                 end,
@@ -210,12 +216,21 @@ return {
                         capabilities = capabilities,
                         init_options = {
                             preferences = {
-                                importModuleSpecifierPreference = 'relative',
-                                includePackageJsonAutoImports = 'auto',
+                                importModuleSpecifierPreference = "relative",
+                                includePackageJsonAutoImports = "auto",
                             },
                         },
                         root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", ".git"),
-                        filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "mjs", "cjs" },
+                        filetypes = {
+                            "javascript",
+                            "javascriptreact",
+                            "javascript.jsx",
+                            "typescript",
+                            "typescriptreact",
+                            "typescript.tsx",
+                            "mjs",
+                            "cjs",
+                        },
                     })
                 end,
 
@@ -223,14 +238,30 @@ return {
                 eslint = function()
                     lspconfig.eslint.setup({
                         capabilities = capabilities,
-                        root_dir = lspconfig.util.root_pattern('.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json',
-                            'eslint.config.js', 'package.json'),
+                        root_dir = lspconfig.util.root_pattern(
+                            ".eslintrc.js",
+                            ".eslintrc.cjs",
+                            ".eslintrc.json",
+                            "eslint.config.js",
+                            "package.json"
+                        ),
                         settings = {
                             -- ESLint settings can be customized here
                             run = "onType",
-                            format = true,                                                                                                                                -- Enable formatting via ESLint
+                            format = true, -- Enable formatting via ESLint
                         },
-                        filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "mjs", "cjs", "html", "vue" } -- Add relevant filetypes
+                        filetypes = {
+                            "javascript",
+                            "javascriptreact",
+                            "javascript.jsx",
+                            "typescript",
+                            "typescriptreact",
+                            "typescript.tsx",
+                            "mjs",
+                            "cjs",
+                            "html",
+                            "vue",
+                        }, -- Add relevant filetypes
                     })
                 end,
 
@@ -256,8 +287,8 @@ return {
                             python = {
                                 analysis = {
                                     -- autoSearchPaths = true, useLibraryCodeForTypes = true
-                                }
-                            }
+                                },
+                            },
                         },
                     })
                 end,
@@ -272,7 +303,7 @@ return {
                         -- cmd = { vim.fn.resolve(vim.fn.stdpath("data") .. "/lazy/kls/server/build/install/server/bin/kotlin-language-server") },
                         root_dir = lspconfig.util.root_pattern("build.gradle", "build.gradle.kts", ".git"),
                         init_options = {
-                            storagePath = vim.fn.resolve(vim.fn.stdpath("cache") .. "/kotlin_language_server")
+                            storagePath = vim.fn.resolve(vim.fn.stdpath("cache") .. "/kotlin_language_server"),
                         },
                     })
                 end,
@@ -300,7 +331,6 @@ return {
                         },
                     })
                 end,
-
             }
 
             -- Apply the handlers
@@ -330,7 +360,7 @@ return {
                     "isort",         -- Python import sorter
                     "flake8",        -- Python linter (consider using just Ruff)
                 },
-                auto_update = false, -- Set to true to auto-update tools
+                auto_update = true,  -- Set to true to auto-update tools
                 run_on_start = true, -- Install tools on startup if missing
             })
 
@@ -358,7 +388,7 @@ return {
             vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵", texthl = "DiagnosticSignHint" })
 
             -- Configure folding appearance
-            vim.opt.foldcolumn = '1'
+            vim.opt.foldcolumn = "1"
             vim.opt.foldlevel = 99
             vim.opt.foldlevelstart = 99
             vim.opt.foldenable = true -- UFO requires folding to be enabled
@@ -367,7 +397,7 @@ return {
     -- Rustaceanvim (alternative/enhanced Rust LSP setup) - KEEP THIS
     {
         "mrcjkb/rustaceanvim",
-        version = '^5',              -- Use a stable version
+        version = "^5",              -- Use a stable version
         lazy = false,
         ft = { "rust" },             -- Load specifically for Rust files
         dependencies = {
@@ -380,11 +410,11 @@ return {
                 "force",
                 {},
                 vim.lsp.protocol.make_client_capabilities(),
-                require('blink.cmp').get_lsp_capabilities()
+                require("blink.cmp").get_lsp_capabilities()
             )
             -- Add folding capabilities if using UFO or similar
             capabilities.textDocument.foldingRange = {
-                dynamicRegistration = false,
+                dynamicRegistration = true,
                 lineFoldingOnly = true,
             }
 
@@ -392,12 +422,13 @@ return {
             -- Attempt to find codelldb via mason-tool-installer path
             local mason_registry = require("mason-registry")
             local has_codelldb, codelldb_pkg = pcall(mason_registry.get_package, "codelldb")
-            if has_codelldb and codelldb_pkg then
+            if has_codelldb then
                 local install_dir = codelldb_pkg:get_install_path()
                 codelldb_path = install_dir .. "/extension/adapter/codelldb"
                 liblldb_path = install_dir .. "/extension/lldb/lib/liblldb.dylib" -- Adjust for OS if needed
             else
-                vim.notify('Couldnt load codelldb', vim.log.levels.ERROR)
+                vim.notify("Mason codelldb package not found", vim.log.levels.ERROR);
+                return
             end
 
             vim.g.rustaceanvim = {
@@ -416,10 +447,12 @@ return {
                         -- Enable inlay hints for Rust
                         vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                         -- Custom keymaps for Rust actions
-                        vim.keymap.set("n", "<leader>ca", function() vim.cmd.RustLsp('codeAction') end,
-                            { silent = true, buffer = bufnr, desc = "Rust: Code Action" })
-                        vim.keymap.set("n", "<leader>re", function() vim.cmd.RustLsp('explainError') end,
-                            { silent = true, buffer = bufnr, desc = "Rust: Explain Error" })
+                        vim.keymap.set("n", "<leader>ca", function()
+                            vim.cmd.RustLsp("codeAction")
+                        end, { silent = true, buffer = bufnr, desc = "Rust: Code Action" })
+                        vim.keymap.set("n", "<leader>re", function()
+                            vim.cmd.RustLsp("explainError")
+                        end, { silent = true, buffer = bufnr, desc = "Rust: Explain Error" })
                         -- Add other LSP keymaps if not set globally in 99-autocmds.lua
                     end,
                     default_settings = {
@@ -461,8 +494,8 @@ return {
                             procMacro = {
                                 enable = true,
                             },
-                        }
-                    }
+                        },
+                    },
                 },
                 dap = {
                     autoload_configurations = true,
@@ -472,7 +505,6 @@ return {
                     load_rust_types = true,
                 },
                 tools = {
-                    hover_actions = { auto_focus = true },
                     autoSetHints = true,
                     hover_with_actions = true,
                     --test_executor = "background",
@@ -490,11 +522,11 @@ return {
     {
         "mbbill/undotree",
         keys = {
-            { "<leader>u", desc = "Undo history" } -- Placeholder description, mapped below
+            { "<leader>u", desc = "Undo history" }, -- Placeholder description, mapped below
         },
 
         config = function()
             vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
-        end
+        end,
     },
 } -- End of return table

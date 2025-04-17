@@ -10,7 +10,7 @@ return {
     -- Load on command or keymap
     --cmd = { "NeovimProjectRoot", "NeovimProjectLoad", "NeovimProjectLoadRecent" },
     keys = {
-        { "<leader>fp", desc = "Find Projects" } -- Placeholder description, mapped below
+        { "<leader>fp", desc = "Find Projects" }, -- Placeholder description, mapped below
     },
     -- priority = 100, -- Usually not needed if loaded lazily
     init = function()
@@ -34,8 +34,10 @@ return {
 
             local ok, projects = pcall(vim.json.decode, content)
             if not ok then
-                vim.notify("Error decoding projects JSON: " .. projects_file .. "\n" .. tostring(projects),
-                    vim.log.levels.ERROR)
+                vim.notify(
+                    "Error decoding projects JSON: " .. projects_file .. "\n" .. tostring(projects),
+                    vim.log.levels.ERROR
+                )
                 return {}
             end
             return projects
@@ -45,15 +47,20 @@ return {
         _G.load_projects_locations = load_projects_locations -- Make accessible in config
     end,
     config = function()
-        local config = require('session_manager.config')
-        require("neovim-project").setup {
+        local config = require("session_manager.config")
+        require("neovim-project").setup({
             -- Load projects using the function defined in init
             projects = _G.load_projects_locations(),
             -- Use Telescope for picking projects
             picker = {
                 type = "telescope",
                 -- Telescope options can be added here if needed
-                telescope_opts = { theme = require("telescope.themes").get_dropdown() }
+                telescope_opts = { theme = require("telescope.themes").get_dropdown() },
+                preview = {
+                    enabled = true, -- show directory structure in Telescope preview
+                    git_status = false, -- show branch name, an ahead/behind counter, and the git status of each file/folder
+                    show_hidden = false, -- show hidden files/folders
+                },
             },
             -- Don't automatically load the last session on startup
             last_session_on_startup = false,
@@ -66,7 +73,7 @@ return {
                 autosave_only_in_session = true,
                 -- Define directories/paths to ignore for automatic session saving
                 autosave_ignore_dirs = {
-                    vim.fn.expand("~"),       -- Don't create sessions directly in HOME
+                    vim.fn.expand("~"), -- Don't create sessions directly in HOME
                     vim.fn.stdpath("config"), -- Don't create sessions for config editing
                     "/tmp",
                 },
@@ -75,10 +82,10 @@ return {
                     "ccc-ui",
                     "gitcommit",
                     "gitrebase",
-                    "qf",       -- Quickfix list
-                    "Trouble",  -- Trouble window
+                    "qf", -- Quickfix list
+                    "Trouble", -- Trouble window
                     "NvimTree", -- File explorer
-                    "alpha",    -- Dashboard
+                    "alpha", -- Dashboard
                     "TelescopePrompt",
                     "mason",
                     "lazy",
@@ -86,14 +93,14 @@ return {
                     "neotest-output",
                 },
                 -- Path where sessions are stored
-                sessions_dir = vim.fn.stdpath('data') .. '/sessions/',
+                sessions_dir = vim.fn.stdpath("data") .. "/sessions/",
                 -- Function to determine the session filename
                 session_filename_maker = function(project_root_dir)
                     local dir_name = vim.fs.basename(project_root_dir)
-                    return dir_name .. '_session.vim'
+                    return dir_name .. "_session.vim"
                 end,
             },
-        }
+        })
 
         -- Keymap to open the project picker
         vim.keymap.set("n", "<leader>fp", function(args)

@@ -105,7 +105,7 @@ return {
             -- Enable asynchronous test discovery
             discovery = {
                 enabled = true,
-                -- concurrent = 0, -- Set a number > 0 for concurrent discovery (experimental)
+                concurrent = 0, -- Set a number > 0 for concurrent discovery (experimental)
             },
             -- log_level = vim.log.levels.DEBUG, -- Uncomment for debugging
             -- Status signs in the sign column
@@ -153,20 +153,20 @@ return {
                 require("neotest-python")({
                     -- Specify the DAP configuration name for debugging Python tests
                     dap = {
-                        adapter = "python", -- Matches the name in nvim-dap config
-                        configuration = function(root, config)
-                            -- Ensure the configuration matches your nvim-dap setup
-                            return vim.tbl_deep_extend("force", config, {
-                                name = "Neotest Python Debug",
-                                type = "python",
-                                request = "launch",
-                                module = "pytest", -- Or "unittest" if using unittest adapter
-                                console = "integratedTerminal",
-                                justMyCode = true,
-                                args = config.args -- Pass args from neotest
-                                -- Add other DAP config options if needed
-                            })
-                        end,
+                        -- adapter = "python", -- Matches the name in nvim-dap config
+                        -- configuration = function(root, config)
+                        --     -- Ensure the configuration matches your nvim-dap setup
+                        --     return vim.tbl_deep_extend("force", config, {
+                        --         name = "Neotest Python Debug",
+                        --         type = "python",
+                        --         request = "launch",
+                        --         module = "pytest", -- Or "unittest" if using unittest adapter
+                        --         console = "integratedTerminal",
+                        --         justMyCode = true,
+                        --         args = config.args -- Pass args from neotest
+                        --         -- Add other DAP config options if needed
+                        --     })
+                        -- end,
                         justMyCode = true, -- Common DAP setting
                     },
                     -- runner = "pytest", -- Explicitly set runner if needed

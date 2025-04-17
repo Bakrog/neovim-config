@@ -24,22 +24,22 @@ return {
             {
                 "rcarriga/nvim-dap-ui",
                 keys = { { "<leader>dU", function() require("dapui").toggle({}) end, desc = "Toggle DAP UI" } },
-                dependencies = {"nvim-neotest/nvim-nio"}, -- Required dependency for dapui
+                dependencies = { "nvim-neotest/nvim-nio" }, -- Required dependency for dapui
                 opts = {
                     layouts = {
                         {
                             elements = {
-                                { id = "scopes", size = 0.25 },
+                                { id = "scopes",      size = 0.25 },
                                 { id = "breakpoints", size = 0.25 },
-                                { id = "stacks", size = 0.25 },
-                                { id = "watches", size = 0.25 },
+                                { id = "stacks",      size = 0.25 },
+                                { id = "watches",     size = 0.25 },
                             },
                             size = 40, -- Width of the side layout
                             position = "left",
                         },
                         {
                             elements = {
-                                { id = "repl", size = 0.5 },
+                                { id = "repl",    size = 0.5 },
                                 { id = "console", size = 0.5 },
                             },
                             size = 0.25, -- Height of the bottom layout
@@ -48,14 +48,14 @@ return {
                     },
                     floating = {
                         max_height = nil, -- Use default
-                        max_width = nil, -- Use default
+                        max_width = nil,  -- Use default
                         border = "rounded",
                         mappings = {
                             close = { "q", "<Esc>" },
                         },
                     },
                     windows = { indent = 1 },
-                    render = { -- Render configuration (optional)
+                    render = {                 -- Render configuration (optional)
                         max_type_length = nil, -- Don't truncate type names
                         max_value_lines = 100, -- Increase max lines shown for values
                     }
@@ -74,7 +74,7 @@ return {
             -- Python debugging support
             {
                 "mfussenegger/nvim-dap-python",
-                ft = "python", -- Load specifically for Python files
+                ft = "python",                          -- Load specifically for Python files
                 dependencies = "mfussenegger/nvim-dap", -- Ensure dap loads first
                 config = function()
                     -- Find python executable, preferring virtual environments
@@ -100,7 +100,7 @@ return {
                     local python_for_debugpy = get_python_path()
                     require("dap-python").setup(python_for_debugpy)
 
-                     -- Add Python DAP configurations
+                    -- Add Python DAP configurations
                     require('dap').configurations.python = {
                         {
                             type = 'python', -- Use the adapter name defined by dap-python
@@ -113,7 +113,7 @@ return {
                             justMyCode = true,
                             console = "integratedTerminal", -- Or "internalConsole"
                         },
-                         {
+                        {
                             type = 'python',
                             request = 'attach',
                             name = "Attach to process",
@@ -124,7 +124,7 @@ return {
                             pathMappings = {
                                 { localRoot = "${workspaceFolder}", remoteRoot = "." }
                             },
-                             justMyCode = true,
+                            justMyCode = true,
                         }
                         -- Add configurations for Django, Flask, etc. if needed
                     }
@@ -134,7 +134,7 @@ return {
         },
         config = function()
             local dap = require("dap")
-            -- dap.set_log_level("DEBUG") -- Uncomment for debugging DAP itself
+            dap.set_log_level("DEBUG") -- Uncomment for debugging DAP itself
 
             -- Define DAP adapters using paths from mason-tool-installer
             local mason_path = vim.fn.stdpath("data") .. "/mason"
@@ -149,7 +149,7 @@ return {
                     args = { "${port}" },
                 },
             }
-             dap.configurations.javascript = { -- Applies to TS as well
+            dap.configurations.javascript = { -- Applies to TS as well
                 {
                     type = "pwa-node",
                     request = "launch",
@@ -163,10 +163,10 @@ return {
                     type = "pwa-node",
                     request = "attach",
                     name = "Attach to process",
-                    processId = require'dap.utils'.pick_process, -- Helper to pick process
+                    processId = require 'dap.utils'.pick_process, -- Helper to pick process
                     cwd = "${workspaceFolder}",
                 },
-                 -- Add Jest config if debugging tests via DAP directly
+                -- Add Jest config if debugging tests via DAP directly
                 -- {
                 --     type = "pwa-node",
                 --     request = "launch",
@@ -186,33 +186,34 @@ return {
             dap.configurations.typescript = dap.configurations.javascript -- Reuse JS config
 
             -- C/C++/Rust/Zig (using codelldb)
-            local codelldb_path = mason_path .. "/packages/codelldb/extension/adapter/codelldb"
-            local liblldb_path = mason_path .. "/packages/codelldb/extension/lldb/lib/liblldb.dylib" -- Adjust for OS (.so for Linux)
+            local codelldb_path = mason_path .. "/packages/codelldb/codelldb"
+            local liblldb_path = mason_path ..
+                "/packages/codelldb/extension/lldb/lib/liblldb.dylib" -- Adjust for OS (.so for Linux)
 
             if vim.fn.executable(codelldb_path) == 1 then
-                dap.adapters.codelldb = {
-                    type = "server",
-                    port = "${port}", -- Will find a free port
-                    executable = {
-                        command = codelldb_path,
-                        args = { "--port", "${port}", "--liblldb", liblldb_path },
-                        -- HACK: Workaround for adapter failing to start on some systems
-                        --   If you see 'Cannot connect to DAP server' errors, uncomment below
-                        -- detached = false,
-                    }
-                }
-                 -- Basic C/C++ config (requires manual build with debug symbols)
+                -- dap.adapters.codelldb = {
+                --     type = "server",
+                --     port = "${port}", -- Will find a free port
+                --     executable = {
+                --         command = codelldb_path,
+                --         args = { "--port", "${port}", "--liblldb", liblldb_path },
+                --         -- HACK: Workaround for adapter failing to start on some systems
+                --         --   If you see 'Cannot connect to DAP server' errors, uncomment below
+                --         -- detached = false,
+                --     }
+                -- }
+                -- Basic C/C++ config (requires manual build with debug symbols)
                 dap.configurations.cpp = {
                     {
                         name = "Launch file",
-                        type = "codelldb",
+                        type = "lldb",
                         request = "launch",
                         program = function()
                             return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
                         end,
                         cwd = '${workspaceFolder}',
                         stopOnEntry = false,
-                         terminal = "integrated", -- Or "external"
+                        terminal = "integrated", -- Or "external"
                     },
                 }
                 dap.configurations.c = dap.configurations.cpp -- Reuse C++ config
@@ -220,15 +221,16 @@ return {
                 -- Rust configuration (delegated to rustaceanvim)
                 -- dap.configurations.rust = { ... } -- See rustaceanvim config
 
-                 -- Zig configuration
+                -- Zig configuration
                 dap.configurations.zig = {
                     {
                         name = "Launch file (Zig)",
-                        type = "codelldb",
+                        type = "lldb",
                         request = "launch",
                         program = function()
                             -- Assumes executable is in ./zig-out/bin/
-                            local root = require("lspconfig.util").root_pattern("build.zig", ".git")(vim.api.nvim_buf_get_name(0))
+                            local root = require("lspconfig.util").root_pattern("build.zig", ".git")(vim.api
+                                .nvim_buf_get_name(0))
                             local exe_name = vim.fs.basename(root)
                             local default_path = root .. "/zig-out/bin/" .. exe_name
                             return vim.fn.input('Path to Zig executable: ', default_path, 'file')
@@ -238,7 +240,6 @@ return {
                         terminal = "integrated",
                     },
                 }
-
             else
                 vim.notify("codelldb adapter not found or not executable at: " .. codelldb_path, vim.log.levels.WARN)
             end
@@ -253,10 +254,11 @@ return {
             vim.keymap.set("n", "<leader>dr", require("dap").repl.toggle, { desc = "DAP: Toggle REPL" })
             vim.keymap.set("n", "<leader>ds", require("dap").terminate, { desc = "DAP: Stop" })
             vim.keymap.set("n", "<leader>dl", require("dap").run_last, { desc = "DAP: Run Last" })
-            vim.keymap.set("n", "<leader>dC", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, { desc = "DAP: Set Conditional Breakpoint" })
-            vim.keymap.set("n", "<leader>dW", require("dap.ui.widgets").hover, { desc = "DAP: Hover Widgets"})
-            vim.keymap.set("n", "<leader>dE", require("dapui").eval, { desc = "DAP: Evaluate Expression"})
-
+            vim.keymap.set("n", "<leader>dC",
+                function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end,
+                { desc = "DAP: Set Conditional Breakpoint" })
+            vim.keymap.set("n", "<leader>dW", require("dap.ui.widgets").hover, { desc = "DAP: Hover Widgets" })
+            vim.keymap.set("n", "<leader>dE", require("dapui").eval, { desc = "DAP: Evaluate Expression" })
         end -- End main config function
-    }, -- End nvim-dap block
-} -- End return table
+    },      -- End nvim-dap block
+}           -- End return table

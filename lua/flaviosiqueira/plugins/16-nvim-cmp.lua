@@ -54,7 +54,7 @@ return {
             {
                 "rcarriga/nvim-notify",
             },
-        }
+        },
     },
     { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
     --{                                        -- optional cmp completion source for require statements and module annotations
@@ -363,7 +363,7 @@ return {
                 use_nvim_cmp_as_default = false,
                 -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
                 -- Adjusts spacing to ensure icons are aligned
-                nerd_font_variant = 'mono'
+                nerd_font_variant = "mono",
             },
             fuzzy = {
                 implementation = "prefer_rust",
@@ -481,7 +481,7 @@ return {
                         async = true,
                         timeout_ms = 8000,
                     })
-                end
+                end,
             },
         },
         config = function()
