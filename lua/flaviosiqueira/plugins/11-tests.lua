@@ -178,9 +178,10 @@ return {
                     jestCommand = "yarn test --",
                     -- Function to find Jest config file
                     jestConfigFile = function(file_path)
-                        return require("neotest.providers.jest.config").find_config(file_path,
-                            { 'jest.config.js', 'jest.config.ts', 'jest.config.mjs', 'jest.config.cjs' })
+                        --return require("neotest.providers.jest.config").find_config(file_path,
+                        --    { 'jest.config.js', 'jest.config.ts', 'jest.config.mjs', 'jest.config.cjs' })
                         -- or return custom path: return vim.fn.getcwd() .. "/jest.config.js"
+                        return vim.fn.getcwd() .. "/jest.config.js"
                     end,
                     -- Disable Jest's internal test discovery if Neotest handles it better
                     -- jest_test_discovery = false,

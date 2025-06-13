@@ -2,13 +2,14 @@
 -- AI and Copilot-like tools configuration
 
 -- Define preferred AI models
-local gemini_model = "gemini-2.5-pro-exp-03-25"
-local claude_model = "claude-3-7-sonnet-20250219"
+local gemini_model = "gemini-2.5-pro-preview-05-06"
+local claude_model = "claude-opus-4-20250514"
 
 return {
     -- VectorCode for codebase context retrieval
     {
         "Davidyz/VectorCode",
+        enabled = false,
         -- build = "uv tool install --python-preference=system 'vectorcode[lsp,legacy] @ git+https://github.com/Davidyz/VectorCode'", -- Manual build if needed
         dependencies = { "nvim-lua/plenary.nvim" },
         -- Load lazily when VectorCode commands are used
@@ -25,12 +26,10 @@ return {
         config = function(_, opts)
             require("vectorcode").setup(opts)
             -- Optional: Start LSP server automatically if using LSP backend
-            local lspconfig = require("lspconfig")
-            lspconfig.vectorcode_server.setup({
+            vim.lsp.enable("vectorcode-server")
+            vim.lsp.config("vectorcode-server", {
                 cmd = { "vectorcode-server" },
-                root_dir = function()
-                    return lspconfig.util.root_pattern(".vectorcode", ".git")(vim.api.nvim_buf_get_name(0))
-                end,
+                root_markers = { ".vectorcode", ".git" },
             })
         end,
     },
@@ -199,85 +198,53 @@ return {
         event = "InsertEnter", -- Load when entering insert mode
         dependencies = {
             { "nvim-lua/plenary.nvim" },
-            { "hrsh7th/nvim-cmp" },   -- Required for CMP frontend
+            -- { "hrsh7th/nvim-cmp" },   -- Required for CMP frontend
+            { "Saghen/blink.cmp" },
             { "Davidyz/VectorCode" }, -- For codebase context
         },
         config = function()
             local minuet = require("minuet")
-            local vectorcode_cacher = require("vectorcode.config").get_cacher_backend()
+            local has_vc, vectorcode_config = pcall(require, "vectorcode.config")
+            local vectorcode_cacher = nil
+            if has_vc then
+                vectorcode_cacher = vectorcode_config.get_cacher_backend()
+            end
+            local RAG_Context_Window_Size = 8000
 
             -- Function to get VectorCode context for Minuet prompts
             local function get_repo_context()
-                local prompt_message = ""
-                -- Adjust n_query as needed (0 means use default)
-                local cache_result = vectorcode_cacher.query_from_cache(0, { notify = false })
-                if not cache_result then
-                    return ""
+                local prompt_message = ''
+                if has_vc and vectorcode_cacher then
+                    local cache_result = vectorcode_cacher.query_from_cache(0)
+                    for _, file in ipairs(cache_result) do
+                        prompt_message = prompt_message .. '<file_separator>' .. file.path .. '\n' .. file.document
+                    end
                 end
 
-                for _, file in ipairs(cache_result) do
-                    prompt_message = prompt_message
-                        .. '<file_separator path="'
-                        .. file.path
-                        .. '">\n'
-                        .. file.document
-                        .. "\n"
-                        .. "</file_separator>\n"
-                end
+                prompt_message = vim.fn.strcharpart(prompt_message, 0, RAG_Context_Window_Size)
 
-                if prompt_message ~= "" then
-                    prompt_message = "<repo_context>\n" .. prompt_message .. "</repo_context>"
+                if prompt_message ~= '' then
+                    prompt_message = '<repo_context>\n' .. prompt_message .. '\n</repo_context>'
                 end
                 return prompt_message
             end
 
             minuet.setup({
-                -- General settings
-                add_single_line_entry = true,     -- Show single-line suggestions in CMP
-                n_completions = 1,                -- Number of suggestions to fetch
-                -- context_window = 2048,  -- Adjust based on model/performance
-                after_cursor_filter_length = 100, -- Characters after cursor to consider
-                notify = "warn",                  -- Log level (debug, info, warn, error)
-
-                -- Frontend configuration (using nvim-cmp)
-                cmp = {
-                    enable_auto_complete = true, -- Enable auto-completion via CMP
-                },
+                notify = "warn", -- Log level (debug, info, warn, error)
                 -- Provider configuration (Gemini example)
-                provider = "gemini",
+                provider = "claude",
                 provider_options = {
                     gemini = {
-                        max_tokens = 512,
                         model = gemini_model,
-                        stream = true,              -- Use streaming for faster feedback
-                        api_key = "GEMINI_API_KEY", -- Use environment variable
                         -- System prompt template
-                        system = {
-                            template = "{{{prompt}}}\n{{{guidelines}}}\n{{{n_completion_template}}}\n{{{repo_context}}}",
-                            repo_context =
-                            [[9. Additional context from other files in the repository will be enclosed in <repo_context> tags. Each file will be separated by <file_separator> tags, containing its relative path and content.]],
-                        },
-                        -- Input prompt template including repo context
                         chat_input = {
-                            template =
-                            "{{{repo_context}}}\n{{{language}}}\n{{{tab}}}\n<contextBeforeCursor>\n{{{context_before_cursor}}}<cursorPosition>\n<contextAfterCursor>\n{{{context_after_cursor}}}",
                             repo_context = get_repo_context, -- Function to fetch context
                         },
                     },
                     -- Add Claude configuration similar to Gemini if needed
                     claude = {
-                        max_tokens = 512,
                         model = claude_model,
-                        stream = true,
-                        api_key = "ANTHROPIC_API_KEY",
-                        system = { -- Similar template as Gemini
-                            template = "{{{prompt}}}\n{{{guidelines}}}\n{{{n_completion_template}}}\n{{{repo_context}}}",
-                            repo_context =
-                            [[9. Additional context from other files in the repository will be enclosed in <repo_context> tags. Each file will be separated by <file_separator> tags, containing its relative path and content.]],
-                        },
                         chat_input = { -- Similar template as Gemini
-                            template =
-                            "{{{repo_context}}}\n{{{language}}}\n{{{tab}}}\n<contextBeforeCursor>\n{{{context_before_cursor}}}<cursorPosition>\n<contextAfterCursor>\n{{{context_after_cursor}}}",
                             repo_context = get_repo_context,
                         },
                     },

@@ -30,7 +30,7 @@ api.nvim_create_autocmd('DirChanged', {
                     -- Construct potential NVM node path (adjust if your NVM setup differs)
                     -- Example assumes NVM stores versions like v18.17.0
                     local node_version_dir = "v" .. nvm_version
-                    local nvm_base_path = vim.fn.expand("~/.nvm/versions/node") -- Common NVM path
+                    local nvm_base_path = vim.fn.expand("~/.local/share/nvm") -- Common NVM path
                     local node_path = nvm_base_path .. "/" .. node_version_dir .. "/bin"
 
                     -- Check if the directory exists before modifying PATH
@@ -44,7 +44,8 @@ api.nvim_create_autocmd('DirChanged', {
                             -- vim.g.node_host_prog = node_path .. "/node"
                         end
                     else
-                        vim.notify("NVM version " .. node_version_dir .. " not found at " .. node_path, vim.log.levels.WARN)
+                        vim.notify("NVM version " .. node_version_dir .. " not found at " .. node_path,
+                            vim.log.levels.WARN)
                     end
                 end
             end
@@ -79,7 +80,8 @@ api.nvim_create_autocmd('LspAttach', {
         map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature Help") -- Use <C-k> or other
         map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "Add Workspace Folder")
         map("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, "Remove Workspace Folder")
-        map("n", "<leader>wl", function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end, "List Workspace Folders")
+        map("n", "<leader>wl", function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+            "List Workspace Folders")
         map("n", "<leader>D", vim.lsp.buf.type_definition, "Type Definition")
         map("n", "<leader>rn", vim.lsp.buf.rename, "Rename Symbol")
         map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action")
@@ -94,23 +96,23 @@ api.nvim_create_autocmd('LspAttach', {
 
         -- VectorCode Integration on LspAttach (if VectorCode is loaded)
         if package.loaded["vectorcode"] and client.name ~= "vectorcode-server" and client.root_dir then
-             local vc_ok, cacher = pcall(require, "vectorcode.config")
-             if vc_ok then
-                 cacher = cacher.get_cacher_backend()
-                 -- Check asynchronously if vectorcode is configured for this project root
-                 cacher.async_check("config", function()
-                     -- Register buffer only if enabled and root_dir exists
-                     if cacher.buf_is_enabled(bufnr) == false and client.root_dir then
-                         cacher.register_buffer(
-                             bufnr,
-                             { project_root = client.root_dir, n_query = 10 } -- Adjust n_query as needed
-                         )
-                          -- vim.notify("VectorCode registered for buffer: " .. bufnr .. " in " .. client.root_dir, vim.log.levels.DEBUG)
-                     end
-                 end, function()
-                     vim.notify("Failed VectorCode config check for " .. client.name, vim.log.levels.WARN)
-                 end)
-             end
+            local vc_ok, cacher = pcall(require, "vectorcode.config")
+            if vc_ok then
+                cacher = cacher.get_cacher_backend()
+                -- Check asynchronously if vectorcode is configured for this project root
+                cacher.async_check("config", function()
+                    -- Register buffer only if enabled and root_dir exists
+                    if cacher.buf_is_enabled(bufnr) == false and client.root_dir then
+                        cacher.register_buffer(
+                            bufnr,
+                            { project_root = client.root_dir, n_query = 10 }  -- Adjust n_query as needed
+                        )
+                        -- vim.notify("VectorCode registered for buffer: " .. bufnr .. " in " .. client.root_dir, vim.log.levels.DEBUG)
+                    end
+                end, function()
+                    vim.notify("Failed VectorCode config check for " .. client.name, vim.log.levels.WARN)
+                end)
+            end
         end
 
         -- Apply completion settings if using nvim-cmp
@@ -125,7 +127,6 @@ api.nvim_create_autocmd('LspAttach', {
         --     buffer = bufnr,
         --     callback = function() vim.lsp.buf.clear_references() end,
         -- })
-
     end,
     desc = "Setup LSP keymaps and integrations on attach"
 })
@@ -133,9 +134,9 @@ api.nvim_create_autocmd('LspAttach', {
 -- Autocommand to automatically format on save (optional)
 api.nvim_create_autocmd("BufWritePre", {
     group = group_name,
-    pattern = {"*.lua", "*.py", "*.js", "*.ts", "*.jsx", "*.tsx", "*.go", "*.rs", "*.zig", "*.json", "*.yaml", "*.toml", "*.md"}, -- Add filetypes to format
+    pattern = { "*.lua", "*.py", "*.js", "*.ts", "*.jsx", "*.tsx", "*.go", "*.rs", "*.zig", "*.json", "*.yaml", "*.toml", "*.md" }, -- Add filetypes to format
     callback = function(args)
-        vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms=1000 }) -- Use sync format on save
+        vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms = 1000 })                                                -- Use sync format on save
     end,
     desc = "Format buffer on save using LSP"
 })
@@ -145,7 +146,7 @@ api.nvim_create_autocmd("TermOpen", {
     group = group_name,
     pattern = "term://*",
     command = "setlocal nonumber norelativenumber nocursorline listchars= NonText: " ..
-              " | startinsert", -- Enter insert mode, simplify statusline
+        " | startinsert",       -- Enter insert mode, simplify statusline
     desc = "Enter insert mode and simplify view in terminal buffers"
 })
 

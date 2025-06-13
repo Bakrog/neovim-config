@@ -8,15 +8,15 @@ require("flaviosiqueira.remap")
 
 -- Bootstrap lazy.nvim package manager
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "--branch=stable", -- Use stable branch
-    "https://github.com/folke/lazy.nvim.git",
-    lazypath,
-  })
+if not vim.uv.fs_stat(lazypath) then
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "--branch=stable", -- Use stable branch
+        "https://github.com/folke/lazy.nvim.git",
+        lazypath,
+    })
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -33,20 +33,20 @@ require("lazy").setup({
     },
     checker = {
         enabled = true, -- Automatically check for plugin updates
-        notify = true, -- Notify about updates
+        notify = true,  -- Notify about updates
     },
     performance = {
         rtp = {
             -- Disable scanning of default runtime paths for performance
             disabled_plugins = {
-                 "gzip",
-                 "matchit",
-                 "matchparen",
-                 -- "netrwPlugin", -- Disable if using nvim-tree or similar
-                 "tarPlugin",
-                 "tohtml",
-                 "tutor",
-                 "zipPlugin",
+                "gzip",
+                "matchit",
+                "matchparen",
+                -- "netrwPlugin", -- Disable if using nvim-tree or similar
+                "tarPlugin",
+                "tohtml",
+                "tutor",
+                "zipPlugin",
             },
         },
     },
@@ -67,4 +67,4 @@ require("lazy").setup({
 -- Optional: Load the colorscheme immediately after setup if not handled by the plugin itself
 -- vim.cmd("colorscheme rose-pine")
 
-print("Neovim configuration loaded.")
+--print("Neovim configuration loaded.")

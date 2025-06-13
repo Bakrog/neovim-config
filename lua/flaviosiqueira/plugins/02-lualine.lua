@@ -3,13 +3,13 @@
 return {
     "nvim-lualine/lualine.nvim",
     dependencies = {
-        "nvim-tree/nvim-web-devicons",        -- Required for icons
-        "folke/noice.nvim",                   -- Integration for Noice UI
-        { "Davidyz/VectorCode", lazy = true } -- Optional VectorCode integration
+        "nvim-tree/nvim-web-devicons",         -- Required for icons
+        "folke/noice.nvim",                    -- Integration for Noice UI
+        { "Davidyz/VectorCode", lazy = true }, -- Optional VectorCode integration
     },
-    event = "VeryLazy",                       -- Load Lualine lazily
+    event = "VeryLazy",                        -- Load Lualine lazily
     config = function()
-        local vectorcode_lualine = {          -- Placeholder if VectorCode not available
+        local vectorcode_lualine = {           -- Placeholder if VectorCode not available
             function()
                 return ""
             end,
@@ -30,7 +30,6 @@ return {
             }
         end
 
-
         require("lualine").setup({
             options = {
                 theme = "rose-pine", -- Match colorscheme
@@ -49,14 +48,23 @@ return {
                 lualine_b = { "branch", "diff" },
                 lualine_c = { { "filename", path = 1 } }, -- Show relative path
                 lualine_x = {
-                    {                                     -- Noice command status
+                    {
+                        require("noice").api.status.message.get_hl,
+                        cond = require("noice").api.status.message.has,
+                    },
+                    {
                         require("noice").api.status.command.get,
                         cond = require("noice").api.status.command.has,
                         color = { fg = "#ff9e64" },
                     },
-                    { -- Noice mode status
+                    {
                         require("noice").api.status.mode.get,
                         cond = require("noice").api.status.mode.has,
+                        color = { fg = "#ff9e64" },
+                    },
+                    {
+                        require("noice").api.status.search.get,
+                        cond = require("noice").api.status.search.has,
                         color = { fg = "#ff9e64" },
                     },
                     "diagnostics",
@@ -81,7 +89,7 @@ return {
                 lualine_c = {},
                 lualine_x = {},
                 lualine_y = { vectorcode_lualine }, -- VectorCode status
-                lualine_z = { 'tabs' }
+                lualine_z = { "tabs" },
             },
             winbar = {},
             inactive_winbar = {},
@@ -95,5 +103,5 @@ return {
                 "nvim-tree", -- Assuming nvim-tree might be used
             },
         })
-    end
+    end,
 }

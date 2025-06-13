@@ -150,191 +150,8 @@ return {
 
             mason_lspconfig.setup({
                 ensure_installed = ensure_installed_servers,
-                automatic_installation = true, -- Automatically install servers on setup
+                automatic_enable = true,
             })
-
-            -- Custom LSP setup handlers
-            local handlers = {
-                -- Default handler: Setup server with capabilities
-                function(server_name)
-                    -- Skip rust-analyzer if rustaceanvim is handling it
-                    if server_name == "rust_analyzer" and vim.g.rustaceanvim then
-                        return
-                    end
-                    -- Skip vectorcode_server if handled elsewhere
-                    if server_name == "vectorcode_server" then
-                        return
-                    end
-
-                    lspconfig[server_name].setup({
-                        capabilities = capabilities,
-                        on_attach = function(client, bufnr)
-                            -- Common on_attach function (can be moved to 99-autocmds.lua)
-                            -- vim.lsp.inlay_hint.enable(true, { bufnr = bufnr }) -- Enable globally or per-server
-                            -- Define keymaps in 99-autocmds.lua using LspAttach event
-                        end,
-                    })
-                end,
-
-                -- Specific setup for lua_ls (Neovim's Lua LSP)
-                lua_ls = function()
-                    lspconfig.lua_ls.setup({
-                        capabilities = capabilities,
-                        settings = {
-                            Lua = {
-                                runtime = { version = "LuaJIT" },
-                                diagnostics = {
-                                    globals = { "vim", "it", "describe", "before_each", "after_each", "require" },
-                                },
-                                workspace = {
-                                    library = vim.api.nvim_get_runtime_file("", true),
-                                    checkThirdParty = false, -- Improve performance
-                                },
-                                telemetry = { enable = false },
-                            },
-                        },
-                    })
-                end,
-
-                -- Specific setup for ruff-lsp (Python Linter/Formatter LSP)
-                ruff = function()
-                    lspconfig.ruff.setup({
-                        capabilities = capabilities,
-                        init_options = {
-                            settings = {
-                                -- Example: Configure lint rules if needed
-                                -- lint = { select = {"E", "F", "W"} }
-                            },
-                        },
-                        -- on_attach function can be defined here or globally
-                    })
-                end,
-
-                -- Specific setup for ts_ls (TypeScript/JavaScript LSP)
-                ["ts_ls"] = function()
-                    lspconfig.ts_ls.setup({
-                        capabilities = capabilities,
-                        init_options = {
-                            preferences = {
-                                importModuleSpecifierPreference = "relative",
-                                includePackageJsonAutoImports = "auto",
-                            },
-                        },
-                        root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", ".git"),
-                        filetypes = {
-                            "javascript",
-                            "javascriptreact",
-                            "javascript.jsx",
-                            "typescript",
-                            "typescriptreact",
-                            "typescript.tsx",
-                            "mjs",
-                            "cjs",
-                        },
-                    })
-                end,
-
-                -- Setup for eslint (Separate Linter/Formatter LSP for JS/TS)
-                eslint = function()
-                    lspconfig.eslint.setup({
-                        capabilities = capabilities,
-                        root_dir = lspconfig.util.root_pattern(
-                            ".eslintrc.js",
-                            ".eslintrc.cjs",
-                            ".eslintrc.json",
-                            "eslint.config.js",
-                            "package.json"
-                        ),
-                        settings = {
-                            -- ESLint settings can be customized here
-                            run = "onType",
-                            format = true, -- Enable formatting via ESLint
-                        },
-                        filetypes = {
-                            "javascript",
-                            "javascriptreact",
-                            "javascript.jsx",
-                            "typescript",
-                            "typescriptreact",
-                            "typescript.tsx",
-                            "mjs",
-                            "cjs",
-                            "html",
-                            "vue",
-                        }, -- Add relevant filetypes
-                    })
-                end,
-
-                -- Setup for basedpyright (Python Type Checker / LSP)
-                basedpyright = function()
-                    lspconfig.basedpyright.setup({
-                        capabilities = capabilities,
-                        -- You might not need to specify the command if Mason handles it
-                        -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/basedpyright-langserver", "--stdio" },
-                        on_attach = function(client, bufnr)
-                            -- Disable Pyright hover if Ruff provides better info or if preferred
-                            -- client.server_capabilities.hoverProvider = false
-                            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                        end,
-                        settings = {
-                            basedpyright = {
-                                analysis = {
-                                    diagnosticMode = "openFilesOnly", -- Or "workspace"
-                                    -- Optional: specify python environment
-                                    -- venvPath = ".", venv = ".venv"
-                                },
-                            },
-                            python = {
-                                analysis = {
-                                    -- autoSearchPaths = true, useLibraryCodeForTypes = true
-                                },
-                            },
-                        },
-                    })
-                end,
-                -- Add other custom handlers here (e.g., kotlin_language_server, zls)
-                kotlin_language_server = function()
-                    lspconfig.kotlin_language_server.setup({
-                        capabilities = capabilities,
-                        on_attach = function(_, bufnr)
-                            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                        end,
-                        -- Command might be handled by Mason, otherwise specify path
-                        -- cmd = { vim.fn.resolve(vim.fn.stdpath("data") .. "/lazy/kls/server/build/install/server/bin/kotlin-language-server") },
-                        root_dir = lspconfig.util.root_pattern("build.gradle", "build.gradle.kts", ".git"),
-                        init_options = {
-                            storagePath = vim.fn.resolve(vim.fn.stdpath("cache") .. "/kotlin_language_server"),
-                        },
-                    })
-                end,
-                zls = function()
-                    lspconfig.zls.setup({
-                        capabilities = capabilities,
-                        -- Command might be handled by Mason
-                        -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/zls" },
-                    })
-                end,
-                templ = function()
-                    lspconfig.templ.setup({
-                        capabilities = capabilities,
-                        filetypes = { "templ", "html" }, -- Associate with .templ files
-                    })
-                end,
-                gopls = function()
-                    lspconfig.gopls.setup({
-                        capabilities = capabilities,
-                        settings = {
-                            gopls = {
-                                gofumpt = true,     -- Use gofumpt formatting
-                                staticcheck = true, -- Enable staticcheck analysis
-                            },
-                        },
-                    })
-                end,
-            }
-
-            -- Apply the handlers
-            mason_lspconfig.setup_handlers(handlers)
 
             -- Mason Tool Installer setup (for linters, formatters, debuggers)
             require("mason-tool-installer").setup({
@@ -375,9 +192,156 @@ return {
                     focusable = false,
                     style = "minimal",
                     border = "rounded",
-                    source = "always", -- Show the source of the diagnostic (e.g., "eslint")
+                    source = true, -- Show the source of the diagnostic (e.g., "eslint")
                     header = "",
                     prefix = "",
+                },
+            })
+
+            -- Custom LSP setup handlers
+            -- Applied to all LSPs
+            vim.lsp.config("*", {
+                capabilities = capabilities,
+                on_attach = function(client, bufnr)
+                    -- Common on_attach function (can be moved to 99-autocmds.lua)
+                    -- vim.lsp.inlay_hint.enable(true, { bufnr = bufnr }) -- Enable globally or per-server
+                    -- Define keymaps in 99-autocmds.lua using LspAttach event
+                end,
+            })
+            -- Specific setup for lua_ls (Neovim's Lua LSP)
+            vim.lsp.config("lua_ls", {
+                capabilities = capabilities,
+                settings = {
+                    Lua = {
+                        runtime = { version = "LuaJIT" },
+                        diagnostics = {
+                            globals = { "vim", "it", "describe", "before_each", "after_each", "require" },
+                        },
+                        workspace = {
+                            library = vim.api.nvim_get_runtime_file("", true),
+                            checkThirdParty = false, -- Improve performance
+                        },
+                        telemetry = { enable = false },
+                    },
+                },
+            })
+            -- Specific setup for ruff-lsp (Python Linter/Formatter LSP)
+            vim.lsp.config("ruff", {
+                capabilities = capabilities,
+                init_options = {
+                    settings = {
+                        -- Example: Configure lint rules if needed
+                        -- lint = { select = {"E", "F", "W"} }
+                    },
+                },
+            })
+            -- Specific setup for ts_ls (TypeScript/JavaScript LSP)
+            vim.lsp.config("ts_ls", {
+                capabilities = capabilities,
+                init_options = {
+                    preferences = {
+                        importModuleSpecifierPreference = "relative",
+                        includePackageJsonAutoImports = "auto",
+                    },
+                },
+                root_markers = { "package.json", "tsconfig.json", ".git" },
+                filetypes = {
+                    "javascript",
+                    "javascriptreact",
+                    "javascript.jsx",
+                    "typescript",
+                    "typescriptreact",
+                    "typescript.tsx",
+                    "mjs",
+                    "cjs",
+                },
+            })
+            -- Setup for eslint (Separate Linter/Formatter LSP for JS/TS)
+            vim.lsp.config("eslint", {
+                capabilities = capabilities,
+                root_markers = {
+                    ".eslintrc.js",
+                    ".eslintrc.cjs",
+                    ".eslintrc.mjs",
+                    ".eslintrc.json",
+                    "eslint.config.mjs",
+                    "eslint.config.js",
+                    "package.json",
+                    ".git"
+                },
+                settings = {
+                    -- ESLint settings can be customized here
+                    run = "onType",
+                    format = false, -- Enable formatting via ESLint
+                },
+                filetypes = {
+                    "javascript",
+                    "javascriptreact",
+                    "javascript.jsx",
+                    "typescript",
+                    "typescriptreact",
+                    "typescript.tsx",
+                    "mjs",
+                    "cjs",
+                    "html",
+                }, -- Add relevant filetypes
+            })
+            -- Setup for basedpyright (Python Type Checker / LSP)
+            vim.lsp.config("basedpyright", {
+                capabilities = capabilities,
+                -- You might not need to specify the command if Mason handles it
+                -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/basedpyright-langserver", "--stdio" },
+                on_attach = function(client, bufnr)
+                    -- Disable Pyright hover if Ruff provides better info or if preferred
+                    -- client.server_capabilities.hoverProvider = false
+                    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                end,
+                settings = {
+                    basedpyright = {
+                        analysis = {
+                            diagnosticMode = "workspace", -- openFilesOnly Or "workspace"
+                            -- Optional: specify python environment
+                            -- venv = ".venv",
+                            autoImportCompletions = true,
+                            inlayHints = {
+                                callArgumentNames = true,
+                                functionReturnTypes = true,
+                                genericTypes = true,
+                                variableTypes = true,
+                            },
+                        },
+                    },
+                },
+            })
+            -- Add other custom handlers here (e.g., kotlin_language_server, zls)
+            vim.lsp.config("kotlin_language_server", {
+                capabilities = capabilities,
+                on_attach = function(_, bufnr)
+                    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                end,
+                -- Command might be handled by Mason, otherwise specify path
+                -- cmd = { vim.fn.resolve(vim.fn.stdpath("data") .. "/lazy/kls/server/build/install/server/bin/kotlin-language-server") },
+                root_markers = { "build.gradle", "build.gradle.kts", ".git" },
+                init_options = {
+                    storagePath = vim.fn.resolve(vim.fn.stdpath("cache") .. "/kotlin_language_server"),
+                },
+            })
+            vim.lsp.config("zls", {
+                capabilities = capabilities,
+                -- Command might be handled by Mason
+                -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/zls" },
+            })
+            vim.lsp.config("templ", {
+                capabilities = capabilities,
+                filetypes = { "templ", "html" }, -- Associate with .templ files
+            })
+            vim.lsp.config("gopls", {
+                capabilities = capabilities,
+                settings = {
+                    gopls = {
+                        gofumpt = true,     -- Use gofumpt formatting
+                        staticcheck = true, -- Enable staticcheck analysis
+                    },
                 },
             })
 
@@ -418,18 +382,8 @@ return {
                 lineFoldingOnly = true,
             }
 
-            local codelldb_path, liblldb_path = nil, nil
-            -- Attempt to find codelldb via mason-tool-installer path
-            local mason_registry = require("mason-registry")
-            local has_codelldb, codelldb_pkg = pcall(mason_registry.get_package, "codelldb")
-            if has_codelldb then
-                local install_dir = codelldb_pkg:get_install_path()
-                codelldb_path = install_dir .. "/extension/adapter/codelldb"
-                liblldb_path = install_dir .. "/extension/lldb/lib/liblldb.dylib" -- Adjust for OS if needed
-            else
-                vim.notify("Mason codelldb package not found", vim.log.levels.ERROR);
-                return
-            end
+            local codelldb_path = "$MASON/packages/codelldb/extension/adapter/codelldb"
+            local liblldb_path = "$MASON/packages/codelldb/extension/lldb/lib/liblldb.dylib"
 
             vim.g.rustaceanvim = {
                 -- Use LSP capabilities
@@ -499,7 +453,7 @@ return {
                 },
                 dap = {
                     autoload_configurations = true,
-                    adapter = require('rustaceanvim.config').get_codelldb_adapter(codelldb_path, liblldb_path),
+                    adapter = require("rustaceanvim.config").get_codelldb_adapter(codelldb_path, liblldb_path),
                     add_dynamic_library_paths = true,
                     auto_generate_source_map = true,
                     load_rust_types = true,

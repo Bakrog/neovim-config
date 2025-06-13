@@ -74,7 +74,7 @@ return {
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
         --version = "*",
-        build = "cargo build --target x86_64-apple-darwin --release",
+        build = "cargo build --release",
         -- In case there are breaking changes and you want to go back to the last
         -- working release
         -- https://github.com/Saghen/blink.cmp/releases
@@ -347,8 +347,11 @@ return {
                     minuet = {
                         name = "minuet",
                         module = "minuet.blink",
-                        score_offset = 10,
-                        timeout_ms = 5000,
+                        async = true,
+                        -- Should match minuet.config.request_timeout * 1000,
+                        -- since minuet.config.request_timeout is in seconds
+                        timeout_ms = 3000,
+                        score_offset = 50, -- Gives minuet higher priority among suggestions
                     },
                 },
                 per_filetype = {
@@ -458,7 +461,7 @@ return {
 
                 ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
                 ["<C-e>"] = { "hide", "fallback" },
-                --['<A-y>'] = require('minuet').make_blink_map(),
+                --["<A-y>"] = require("minuet").make_blink_map(),
             },
             -- Experimental signature help support
             signature = {
