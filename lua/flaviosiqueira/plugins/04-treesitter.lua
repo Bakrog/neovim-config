@@ -2,9 +2,9 @@
 -- Treesitter configuration for syntax highlighting and more
 return {
     "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate", -- Command to update parsers
+    build = ":TSUpdate",                    -- Command to update parsers
     event = { "BufReadPre", "BufNewFile" }, -- Load early for highlighting/indent
-    config = function ()
+    config = function()
         local configs = require("nvim-treesitter.configs")
 
         configs.setup({
@@ -25,7 +25,7 @@ return {
                 "typescript",
                 "vim",
                 "vimdoc",
-                "markdown", -- Added markdown here
+                "markdown",        -- Added markdown here
                 "markdown_inline", -- For inline markdown highlighting
                 "json",
                 "yaml",
@@ -34,13 +34,13 @@ return {
                 "templ", -- Added templ here
                 "zig",
             },
-            sync_install = false, -- Install parsers asynchronously
-            auto_install = true, -- Automatically install missing parsers
+            sync_install = false,                          -- Install parsers asynchronously
+            auto_install = true,                           -- Automatically install missing parsers
             highlight = {
-                enable = true, -- Enable syntax highlighting
+                enable = true,                             -- Enable syntax highlighting
                 additional_vim_regex_highlighting = false, -- Use Treesitter primarily
             },
-            indent = { enable = true }, -- Enable Treesitter-based indentation
+            indent = { enable = true },                    -- Enable Treesitter-based indentation
             -- Other modules can be enabled here (e.g., incremental selection)
         })
 
@@ -49,7 +49,7 @@ return {
         parser_config.templ = {
             install_info = {
                 url = "https://github.com/vrischmann/tree-sitter-templ.git",
-                files = {"src/parser.c", "src/scanner.c"},
+                files = { "src/parser.c", "src/scanner.c" },
                 branch = "master",
                 -- generate_requires_npm = false, -- Uncomment if it requires npm build steps
                 -- requires_generate_from_grammar = false, -- Uncomment if grammar needs generation

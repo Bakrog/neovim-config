@@ -11,7 +11,7 @@ if not augroup_exists then
 end
 
 -- Autocommand to handle Node.js version switching based on .nvmrc
-api.nvim_create_autocmd('DirChanged', {
+api.nvim_create_autocmd("DirChanged", {
     group = group_name,
     pattern = "*", -- Trigger for any directory change
     callback = function(args)
@@ -39,32 +39,39 @@ api.nvim_create_autocmd('DirChanged', {
                         -- Prepend Node path only if not already present to avoid duplicates
                         if not string.find(current_path, node_path .. ":", 1, true) then
                             vim.env.PATH = node_path .. ":" .. current_path
-                            vim.notify("Switched Node to " .. node_version_dir .. " (PATH updated)", vim.log.levels.INFO)
+                            vim.notify(
+                                "Switched Node to " .. node_version_dir .. " (PATH updated)",
+                                vim.log.levels.INFO
+                            )
                             -- Optional: Set global node path for plugins that might need it
                             -- vim.g.node_host_prog = node_path .. "/node"
                         end
                     else
-                        vim.notify("NVM version " .. node_version_dir .. " not found at " .. node_path,
-                            vim.log.levels.WARN)
+                        vim.notify(
+                            "NVM version " .. node_version_dir .. " not found at " .. node_path,
+                            vim.log.levels.WARN
+                        )
                     end
                 end
             end
         end
     end,
-    desc = "Update PATH based on .nvmrc on directory change"
+    desc = "Update PATH based on .nvmrc on directory change",
 })
 
 -- Autocommand for LSP Attachments
-api.nvim_create_autocmd('LspAttach', {
+api.nvim_create_autocmd("LspAttach", {
     group = group_name,
     callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         local bufnr = args.buf
 
-        if client == nil then return end
+        if client == nil then
+            return
+        end
 
         -- Disable hover for specific linters if main LSP provides it
-        if client.name == 'ruff_lsp' or client.name == 'eslint' then
+        if client.name == "ruff_lsp" or client.name == "eslint" then
             client.server_capabilities.hoverProvider = false
         end
 
@@ -80,13 +87,16 @@ api.nvim_create_autocmd('LspAttach', {
         map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature Help") -- Use <C-k> or other
         map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "Add Workspace Folder")
         map("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, "Remove Workspace Folder")
-        map("n", "<leader>wl", function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-            "List Workspace Folders")
+        map("n", "<leader>wl", function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, "List Workspace Folders")
         map("n", "<leader>D", vim.lsp.buf.type_definition, "Type Definition")
         map("n", "<leader>rn", vim.lsp.buf.rename, "Rename Symbol")
         map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action")
         map("n", "gr", require("telescope.builtin").lsp_references, "Find References")
-        map("n", "<leader>f", function() vim.lsp.buf.format { async = true } end, "Format Buffer")
+        map("n", "<leader>f", function()
+            vim.lsp.buf.format({ async = true })
+        end, "Format Buffer")
 
         -- Diagnostics Keymaps (using vim.diagnostic)
         map("n", "[d", vim.diagnostic.goto_prev, "Go to Previous Diagnostic")
@@ -94,20 +104,30 @@ api.nvim_create_autocmd('LspAttach', {
         map("n", "<leader>e", vim.diagnostic.open_float, "Show Line Diagnostics")
         map("n", "<leader>q", vim.diagnostic.setloclist, "Send Diagnostics to Loclist")
 
+        -- vim.notify("Inspect - " .. client.name .. " in: " .. vim.inspect(client), vim.log.levels.INFO)
         -- VectorCode Integration on LspAttach (if VectorCode is loaded)
-        if package.loaded["vectorcode"] and client.name ~= "vectorcode-server" and client.root_dir then
-            local vc_ok, cacher = pcall(require, "vectorcode.config")
+        if package.loaded["vectorcode"] and client.name ~= "vectorcode_server" and client.root_dir then
+            local vc_ok, cacher = pcall(require, "vectorcode.cacher")
             if vc_ok then
-                cacher = cacher.get_cacher_backend()
                 -- Check asynchronously if vectorcode is configured for this project root
-                cacher.async_check("config", function()
+                cacher.utils.async_check("config", function()
                     -- Register buffer only if enabled and root_dir exists
-                    if cacher.buf_is_enabled(bufnr) == false and client.root_dir then
-                        cacher.register_buffer(
-                            bufnr,
-                            { project_root = client.root_dir, n_query = 10 }  -- Adjust n_query as needed
-                        )
-                        -- vim.notify("VectorCode registered for buffer: " .. bufnr .. " in " .. client.root_dir, vim.log.levels.DEBUG)
+                    if client.root_dir then
+                        if cacher.lsp.buf_is_enabled(bufnr) then
+                            cacher.lsp.register_buffer(
+                                bufnr,
+                                { project_root = client.root_dir, n_query = 10 } -- Adjust n_query as needed
+                            )
+                            -- vim.notify("VcodebaseectorCode registered for buffer: " .. bufnr .. " in " .. client.root_dir, vim.log.levels.DEBUG)
+                        else
+                            if cacher.default.buf_is_enabled(bufnr) then
+                                cacher.default.register_buffer(
+                                    bufnr,
+                                    { project_root = client.root_dir, n_query = 10 } -- Adjust n_query as needed
+                                )
+                                -- vim.notify("VcodebaseectorCode registered for buffer: " .. bufnr .. " in " .. client.root_dir, vim.log.levels.DEBUG)
+                            end
+                        end
                     end
                 end, function()
                     vim.notify("Failed VectorCode config check for " .. client.name, vim.log.levels.WARN)
@@ -128,33 +148,46 @@ api.nvim_create_autocmd('LspAttach', {
         --     callback = function() vim.lsp.buf.clear_references() end,
         -- })
     end,
-    desc = "Setup LSP keymaps and integrations on attach"
+    desc = "Setup LSP keymaps and integrations on attach",
 })
 
 -- Autocommand to automatically format on save (optional)
 api.nvim_create_autocmd("BufWritePre", {
     group = group_name,
-    pattern = { "*.lua", "*.py", "*.js", "*.ts", "*.jsx", "*.tsx", "*.go", "*.rs", "*.zig", "*.json", "*.yaml", "*.toml", "*.md" }, -- Add filetypes to format
+    pattern = {
+        "*.lua",
+        "*.py",
+        "*.js",
+        "*.ts",
+        "*.jsx",
+        "*.tsx",
+        "*.go",
+        "*.rs",
+        "*.zig",
+        "*.json",
+        "*.yaml",
+        "*.toml",
+        "*.md",
+    },                                                                             -- Add filetypes to format
     callback = function(args)
-        vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms = 1000 })                                                -- Use sync format on save
+        vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms = 1000 }) -- Use sync format on save
     end,
-    desc = "Format buffer on save using LSP"
+    desc = "Format buffer on save using LSP",
 })
 
 -- Autocommand for terminal buffer handling
 api.nvim_create_autocmd("TermOpen", {
     group = group_name,
     pattern = "term://*",
-    command = "setlocal nonumber norelativenumber nocursorline listchars= NonText: " ..
-        " | startinsert",       -- Enter insert mode, simplify statusline
-    desc = "Enter insert mode and simplify view in terminal buffers"
+    command = "setlocal nonumber norelativenumber nocursorline listchars= NonText: " .. " | startinsert", -- Enter insert mode, simplify statusline
+    desc = "Enter insert mode and simplify view in terminal buffers",
 })
 
 api.nvim_create_autocmd("BufLeave", {
     group = group_name,
     pattern = "term://*",
     command = "stopinsert", -- Exit insert mode when leaving terminal buffer
-    desc = "Exit insert mode when leaving terminal"
+    desc = "Exit insert mode when leaving terminal",
 })
 
 -- Abbreviation for CodeCompanion command

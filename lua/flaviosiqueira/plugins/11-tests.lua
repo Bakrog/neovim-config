@@ -13,7 +13,7 @@ return {
         "nvim-neotest/neotest-python",                     -- Python (pytest, unittest)
         "haydenmeade/neotest-jest",                        -- Jest (JavaScript/TypeScript)
         "jfpedroza/neotest-elixir",                        -- Elixir (ExUnit)
-        { "lawrence-laz/neotest-zig", version = "1.3.*" }, -- Zig tests
+        { "lawrence-laz/neotest-zig", version = "1.4.*" }, -- Zig tests
         "marilari88/neotest-vitest",                       -- Vitest (JavaScript/TypeScript)
         "mrcjkb/rustaceanvim",                             -- Integrates Neotest for Rust
 
@@ -193,6 +193,7 @@ return {
                 require("neotest-zig").setup({
                     -- Zig specific options
                     -- dap = { adapter = "codelldb" } -- Example DAP config
+                    log_level = vim.log.levels.TRACE,
                 }),
             } -- End adapters table
         })    -- End neotest.setup

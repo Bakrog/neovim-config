@@ -9,8 +9,10 @@ return {
     -- VectorCode for codebase context retrieval
     {
         "Davidyz/VectorCode",
-        enabled = false,
-        -- build = "uv tool install --python-preference=system 'vectorcode[lsp,legacy] @ git+https://github.com/Davidyz/VectorCode'", -- Manual build if needed
+        enabled = true,
+        version = "*",
+        build =
+        "uv tool install --python-preference=system 'vectorcode[lsp] @ git+https://github.com/Davidyz/VectorCode'", -- Manual build if needed
         dependencies = { "nvim-lua/plenary.nvim" },
         -- Load lazily when VectorCode commands are used
         cmd = "VectorCode",
@@ -26,11 +28,12 @@ return {
         config = function(_, opts)
             require("vectorcode").setup(opts)
             -- Optional: Start LSP server automatically if using LSP backend
-            vim.lsp.enable("vectorcode-server")
-            vim.lsp.config("vectorcode-server", {
+            vim.lsp.config("vectorcode_server", {
                 cmd = { "vectorcode-server" },
                 root_markers = { ".vectorcode", ".git" },
             })
+            vim.lsp.enable("vectorcode_server", false)
+            vim.lsp.enable("vectorcode_server", true)
         end,
     },
 
@@ -94,7 +97,7 @@ return {
                         -- system_prompt = "You are CodeCompanion, an AI assistant in Neovim...",
                         slash_commands = {
                             -- VectorCode integration for codebase context
-                            ["codebase"] = vectorcode_slash_command,
+                            ["vectorcode"] = vectorcode_slash_command,
                             -- File selection command using Telescope
                             ["file"] = {
                                 callback = "strategies.chat.slash_commands.file",
@@ -190,85 +193,17 @@ return {
             -- end
         end,
     },
-
-    -- Minuet AI (Inline Autocompletion - Alternative/Complementary)
+    -- Supermaven autocomplete
     {
-        "milanglacier/minuet-ai.nvim",
-        enabled = false,       -- Disabled by default, enable if preferred over CodeCompanion inline
-        event = "InsertEnter", -- Load when entering insert mode
-        dependencies = {
-            { "nvim-lua/plenary.nvim" },
-            -- { "hrsh7th/nvim-cmp" },   -- Required for CMP frontend
-            { "Saghen/blink.cmp" },
-            { "Davidyz/VectorCode" }, -- For codebase context
-        },
+        "supermaven-inc/supermaven-nvim",
         config = function()
-            local minuet = require("minuet")
-            local has_vc, vectorcode_config = pcall(require, "vectorcode.config")
-            local vectorcode_cacher = nil
-            if has_vc then
-                vectorcode_cacher = vectorcode_config.get_cacher_backend()
-            end
-            local RAG_Context_Window_Size = 8000
-
-            -- Function to get VectorCode context for Minuet prompts
-            local function get_repo_context()
-                local prompt_message = ''
-                if has_vc and vectorcode_cacher then
-                    local cache_result = vectorcode_cacher.query_from_cache(0)
-                    for _, file in ipairs(cache_result) do
-                        prompt_message = prompt_message .. '<file_separator>' .. file.path .. '\n' .. file.document
-                    end
-                end
-
-                prompt_message = vim.fn.strcharpart(prompt_message, 0, RAG_Context_Window_Size)
-
-                if prompt_message ~= '' then
-                    prompt_message = '<repo_context>\n' .. prompt_message .. '\n</repo_context>'
-                end
-                return prompt_message
-            end
-
-            minuet.setup({
-                notify = "warn", -- Log level (debug, info, warn, error)
-                -- Provider configuration (Gemini example)
-                provider = "claude",
-                provider_options = {
-                    gemini = {
-                        model = gemini_model,
-                        -- System prompt template
-                        chat_input = {
-                            repo_context = get_repo_context, -- Function to fetch context
-                        },
-                    },
-                    -- Add Claude configuration similar to Gemini if needed
-                    claude = {
-                        model = claude_model,
-                        chat_input = { -- Similar template as Gemini
-                            repo_context = get_repo_context,
-                        },
-                    },
-                }, -- End provider_options
-            })     -- End minuet.setup
-
-            -- CMP source configuration for Minuet
-            local cmp_ok, cmp = pcall(require, "cmp")
-            if cmp_ok then
-                cmp.setup.buffer({
-                    sources = cmp.config.sources({
-                        { name = "minuet" }, -- Add Minuet source
-                        -- Add other CMP sources (nvim_lsp, luasnip, buffer, path, etc.)
-                        { name = "nvim_lsp" },
-                        -- { name = "luasnip" },
-                        { name = "buffer" },
-                        { name = "path" },
-                    }),
-                })
-                -- Configure keybindings for CMP accept/scroll if not already set
-                -- vim.keymap.set("i", "<Tab>", cmp.mapping.select_next_item(), { noremap = true, silent = true })
-                -- vim.keymap.set("i", "<S-Tab>", cmp.mapping.select_prev_item(), { noremap = true, silent = true })
-                -- vim.keymap.set("i", "<CR>", cmp.mapping.confirm({ select = true }), { noremap = true, silent = true })
-            end
-        end, -- End config function
-    },       -- End Minuet block
-}            -- End return table
+            require("supermaven-nvim").setup({
+                keymaps = {
+                    accept_suggestion = "<Tab>",
+                    clear_suggestion = "<C-Esc>",
+                    accept_word = "<C-j>",
+                },
+            })
+        end,
+    }, -- End supermaven block
+}      -- End return table
