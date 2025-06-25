@@ -2,8 +2,9 @@
 -- AI and Copilot-like tools configuration
 
 -- Define preferred AI models
-local gemini_model = "gemini-2.5-pro-preview-05-06"
+local gemini_model = "gemini-2.5-pro-preview-06-05"
 local claude_model = "claude-opus-4-20250514"
+local ollama_model = "deepseek-r1:14b-qwen-distill-q8_0"
 
 return {
     -- VectorCode for codebase context retrieval
@@ -28,12 +29,11 @@ return {
         config = function(_, opts)
             require("vectorcode").setup(opts)
             -- Optional: Start LSP server automatically if using LSP backend
-            vim.lsp.config("vectorcode_server", {
+            vim.lsp.config("vectorcode-server", {
                 cmd = { "vectorcode-server" },
                 root_markers = { ".vectorcode", ".git" },
             })
-            vim.lsp.enable("vectorcode_server", false)
-            vim.lsp.enable("vectorcode_server", true)
+            vim.lsp.enable("vectorcode-server", true)
         end,
     },
 
@@ -54,6 +54,13 @@ return {
                 end,
             },
             "Davidyz/VectorCode", -- For codebase context tool
+            {
+                "ravitemer/mcphub.nvim",
+                build = "npm install -g mcp-hub@latest",
+                config = function()
+                    require("mcphub").setup()
+                end,
+            },
         },
         -- Load lazily via keys or commands
         cmd = { "CodeCompanionActions", "CodeCompanionChat", "CodeCompanionInline" },
@@ -66,17 +73,17 @@ return {
             local adapters = require("codecompanion.adapters")
 
             -- Setup VectorCode integration helpers
-            local vectorcode_chat_tool, vectorcode_slash_command
-            local vc_ok, vc_integrations = pcall(require, "vectorcode.integrations")
-            if vc_ok then
-                vectorcode_chat_tool = vc_integrations.codecompanion.chat.make_tool()
-                vectorcode_slash_command = vc_integrations.codecompanion.chat.make_slash_command()
-            else
-                vectorcode_chat_tool = function()
-                    vim.notify("VectorCode integration not available", vim.log.levels.WARN)
-                end
-                vectorcode_slash_command = { description = "VectorCode not available" }
-            end
+            -- local vectorcode_chat_tool, vectorcode_slash_command
+            -- local vc_ok, vc_integrations = pcall(require, "vectorcode.integrations")
+            -- if vc_ok then
+            --     vectorcode_chat_tool = vc_integrations.codecompanion.chat.make_tool()
+            --     vectorcode_slash_command = vc_integrations.codecompanion.chat.make_slash_command()
+            -- else
+            --     vectorcode_chat_tool = function()
+            --         vim.notify("VectorCode integration not available", vim.log.levels.WARN)
+            --     end
+            --     vectorcode_slash_command = { description = "VectorCode not available" }
+            -- end
 
             codecompanion.setup({
                 -- Configure AI model adapters
@@ -87,6 +94,9 @@ return {
                     anthropic = adapters.extend("anthropic", {
                         schema = { model = { default = claude_model } },
                     }),
+                    ollama = adapters.extend("ollama", {
+                        schema = { model = { default = ollama_model } },
+                    }),
                     -- Add other adapters like Ollama, OpenAI if needed
                 },
                 -- Configure strategies (chat, inline, actions)
@@ -96,8 +106,6 @@ return {
                         -- Use default system prompt or customize
                         -- system_prompt = "You are CodeCompanion, an AI assistant in Neovim...",
                         slash_commands = {
-                            -- VectorCode integration for codebase context
-                            ["vectorcode"] = vectorcode_slash_command,
                             -- File selection command using Telescope
                             ["file"] = {
                                 callback = "strategies.chat.slash_commands.file",
@@ -116,11 +124,6 @@ return {
                             },
                         },
                         tools = {
-                            -- VectorCode tool
-                            vectorcode = {
-                                description = "Retrieve project context using VectorCode.",
-                                callback = vectorcode_chat_tool,
-                            },
                             -- Add other tools if needed
                         },
                     },
@@ -162,6 +165,29 @@ return {
                 opts = {
                     log_level = "INFO", -- Set log level (DEBUG, INFO, WARN, ERROR)
                     -- notify_errors = true, -- Show notifications for errors
+                },
+                extensions = {
+                    vectorcode = {
+                        opts = {
+                            add_tool = true,
+                            add_slash_command = true,
+                            tool_opts = {
+                                max_num = { chunk = -1, document = -1 },
+                                default_num = { chunk = 50, document = 10 },
+                                -- include_stderr = false,
+                                use_lsp = true,
+                                no_duplicate = true,
+                            },
+                        },
+                    },
+                    mcphub = {
+                        callback = "mcphub.extensions.codecompanion",
+                        opts = {
+                            show_result_in_chat = true, -- Show mcp tool results in chat
+                            make_vars = true,           -- Convert resources to #variables
+                            make_slash_commands = true, -- Add prompts as /slash commands
+                        }
+                    },
                 },
             })
 

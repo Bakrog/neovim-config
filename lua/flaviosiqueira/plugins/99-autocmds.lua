@@ -106,7 +106,7 @@ api.nvim_create_autocmd("LspAttach", {
 
         -- vim.notify("Inspect - " .. client.name .. " in: " .. vim.inspect(client), vim.log.levels.INFO)
         -- VectorCode Integration on LspAttach (if VectorCode is loaded)
-        if package.loaded["vectorcode"] and client.name ~= "vectorcode_server" and client.root_dir then
+        if package.loaded["vectorcode"] and client.name ~= "vectorcode-server" and client.root_dir then
             local vc_ok, cacher = pcall(require, "vectorcode.cacher")
             if vc_ok then
                 -- Check asynchronously if vectorcode is configured for this project root

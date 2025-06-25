@@ -289,6 +289,7 @@ return {
             -- Setup for basedpyright (Python Type Checker / LSP)
             vim.lsp.config("basedpyright", {
                 capabilities = capabilities,
+                root_markers = { ".git" },
                 -- You might not need to specify the command if Mason handles it
                 -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/basedpyright-langserver", "--stdio" },
                 on_attach = function(client, bufnr)
